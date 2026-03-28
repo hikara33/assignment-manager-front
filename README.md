@@ -1,6 +1,6 @@
 # assignment-manager-front
 
-Клиент для [Assignment Manager API](https://github.com/hikara33/assignment-manager): React 19, Next.js 16 (App Router), TypeScript, Tailwind CSS 4.
+Клиент для [Assignment Manager API](https://github.com/hikara33/assignment-manager): React 19, Next.js 16 (App Router), TypeScript, Tailwind CSS 4, **axios** для HTTP.
 
 ## Запуск
 

@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { ApiError, apiFetch, apiJson } from "@/lib/api";
+import { ApiError, apiClient, apiJson } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
 import type { Assignment, GroupMemberRow, Paginated } from "@/lib/types";
 import { Card } from "@/components/ui/card";
@@ -49,7 +49,7 @@ export default function GroupDetailPage() {
     mutationFn: () =>
       apiJson<unknown>(`/group/${id}/invite`, {
         method: "POST",
-        body: JSON.stringify({ email }),
+        data: { email },
       }),
     onSuccess: () => {
       setEmail("");
@@ -62,8 +62,7 @@ export default function GroupDetailPage() {
 
   const leave = useMutation({
     mutationFn: async () => {
-      const res = await apiFetch(`/group/${id}/members`, { method: "DELETE" });
-      if (!res.ok) throw new Error(await res.text());
+      await apiClient.delete(`/group/${id}/members`);
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["my-groups"] });
@@ -73,8 +72,7 @@ export default function GroupDetailPage() {
 
   const removeGroup = useMutation({
     mutationFn: async () => {
-      const res = await apiFetch(`/group/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error(await res.text());
+      await apiClient.delete(`/group/${id}`);
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["my-groups"] });
@@ -84,10 +82,7 @@ export default function GroupDetailPage() {
 
   const kick = useMutation({
     mutationFn: async (memberId: string) => {
-      const res = await apiFetch(`/group/${id}/members/${memberId}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error(await res.text());
+      await apiClient.delete(`/group/${id}/members/${memberId}`);
     },
     onSuccess: () => {
       void members.refetch();
@@ -98,7 +93,7 @@ export default function GroupDetailPage() {
     mutationFn: async () => {
       return apiJson(`/group/${id}/owner`, {
         method: "PATCH",
-        body: JSON.stringify({ newOwner: ownerPick }),
+        data: { newOwner: ownerPick },
       });
     },
     onSuccess: () => {

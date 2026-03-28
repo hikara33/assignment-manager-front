@@ -54,14 +54,14 @@ export default function NewAssignmentPage() {
     mutationFn: async () => {
       return apiJson<Assignment>("/assignment/create", {
         method: "POST",
-        body: JSON.stringify({
+        data: {
           title,
           description: description || undefined,
           dueDay: dueIso,
           subjectId,
           groupId: groupId || undefined,
           priority,
-        }),
+        },
       });
     },
     onSuccess: (a) => {

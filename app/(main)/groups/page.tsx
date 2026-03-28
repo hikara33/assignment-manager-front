@@ -34,7 +34,7 @@ export default function GroupsPage() {
     mutationFn: async () => {
       return apiJson<Group>("/group/create", {
         method: "POST",
-        body: JSON.stringify({ name }),
+        data: { name },
       });
     },
     onSuccess: () => {

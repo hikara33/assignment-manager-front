@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ApiError, apiFetch, apiJson } from "@/lib/api";
+import { ApiError, apiClient, apiJson } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
 import type { Subject, User } from "@/lib/types";
 import { Card } from "@/components/ui/card";
@@ -60,10 +60,10 @@ function AdminContent() {
     mutationFn: () =>
       apiJson<Subject>("/subject/create", {
         method: "POST",
-        body: JSON.stringify({
+        data: {
           name: subName,
           description: subDesc || undefined,
-        }),
+        },
       }),
     onSuccess: () => {
       setSubName("");
@@ -78,8 +78,7 @@ function AdminContent() {
 
   const deleteSubject = useMutation({
     mutationFn: async (subjectId: string) => {
-      const res = await apiFetch(`/subject/${subjectId}`, { method: "DELETE" });
-      if (!res.ok) throw new Error(await res.text());
+      await apiClient.delete(`/subject/${subjectId}`);
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["subjects"] });

@@ -1,19 +1,26 @@
+import axios, { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from "axios";
 import { getAccessToken, useAuthStore } from "./auth-store";
 import type { User } from "./types";
 
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
+const plainClient = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+});
+
 let refreshPromise: Promise<string | null> | null = null;
 
 async function rawRefresh(): Promise<string | null> {
-  const res = await fetch(`${API_URL}/auth/refresh`, {
-    credentials: "include",
-    cache: "no-store",
-  });
-  if (!res.ok) return null;
-  const data = (await res.json()) as { accessToken: string };
-  return data.accessToken ?? null;
+  try {
+    const { data } = await plainClient.get<{ accessToken: string }>(
+      "/auth/refresh",
+    );
+    return data.accessToken ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export async function refreshAccessToken(): Promise<string | null> {
@@ -24,6 +31,50 @@ export async function refreshAccessToken(): Promise<string | null> {
   }
   return refreshPromise;
 }
+
+export const apiClient = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+});
+
+apiClient.interceptors.request.use((config) => {
+  const token = getAccessToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+const SKIP_AUTH_RETRY = new Set([
+  "/auth/login",
+  "/auth/register",
+  "/auth/refresh",
+]);
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError) => {
+    const config = error.config as
+      | (InternalAxiosRequestConfig & { _retry?: boolean })
+      | undefined;
+    if (!config || error.response?.status !== 401) {
+      return Promise.reject(error);
+    }
+    const pathOnly = config.url?.split("?")[0] ?? "";
+    if (config._retry || SKIP_AUTH_RETRY.has(pathOnly)) {
+      return Promise.reject(error);
+    }
+    config._retry = true;
+    const newToken = await refreshAccessToken();
+    if (newToken) {
+      useAuthStore.getState().setSession(newToken, useAuthStore.getState().user);
+      config.headers.Authorization = `Bearer ${newToken}`;
+      return apiClient.request(config);
+    }
+    useAuthStore.getState().clear();
+    return Promise.reject(error);
+  },
+);
 
 export class ApiError extends Error {
   constructor(
@@ -44,74 +95,44 @@ function formatMessage(body: unknown): string {
   return "Ошибка запроса";
 }
 
-export type ApiFetchOptions = RequestInit & { _retried?: boolean };
-
-export async function apiFetch(
-  path: string,
-  options: ApiFetchOptions = {},
-): Promise<Response> {
-  const { _retried, ...init } = options;
-  const headers = new Headers(init.headers);
-  const token = getAccessToken();
-  if (token) headers.set("Authorization", `Bearer ${token}`);
-  if (
-    init.body &&
-    typeof init.body === "string" &&
-    !headers.has("Content-Type")
-  ) {
-    headers.set("Content-Type", "application/json");
-  }
-
-  const res = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers,
-    credentials: "include",
-  });
-
-  if (res.status === 401 && path !== "/auth/refresh" && !_retried) {
-    const newToken = await refreshAccessToken();
-    if (newToken) {
-      useAuthStore.getState().setSession(newToken, useAuthStore.getState().user);
-      return apiFetch(path, { ...options, _retried: true });
-    }
-  }
-
-  return res;
-}
-
 export async function apiJson<T>(
   path: string,
-  options: ApiFetchOptions = {},
+  config?: AxiosRequestConfig,
 ): Promise<T> {
-  const res = await apiFetch(path, options);
-  const text = await res.text();
-  let body: unknown = null;
   try {
-    body = text ? JSON.parse(text) : null;
-  } catch {
-    body = text;
-  }
-  if (!res.ok) {
-    if (res.status === 401) {
-      useAuthStore.getState().clear();
+    const { data } = await apiClient.request<T>({
+      url: path,
+      ...config,
+    });
+    return data;
+  } catch (e) {
+    if (axios.isAxiosError(e)) {
+      const status = e.response?.status ?? 0;
+      const body = e.response?.data;
+      if (status === 401) {
+        useAuthStore.getState().clear();
+      }
+      throw new ApiError(status, body, formatMessage(body));
     }
-    throw new ApiError(res.status, body, formatMessage(body));
+    throw e;
   }
-  return body as T;
 }
 
 export async function loginRequest(email: string, password: string) {
-  const res = await fetch(`${API_URL}/auth/login`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new ApiError(res.status, body, formatMessage(body));
+  try {
+    const { data } = await plainClient.post<{ accessToken: string }>(
+      "/auth/login",
+      { email, password },
+    );
+    return data;
+  } catch (e) {
+    if (axios.isAxiosError(e)) {
+      const status = e.response?.status ?? 0;
+      const body = e.response?.data;
+      throw new ApiError(status, body, formatMessage(body));
+    }
+    throw e;
   }
-  return body as { accessToken: string };
 }
 
 export async function registerRequest(
@@ -119,27 +140,24 @@ export async function registerRequest(
   password: string,
   name: string,
 ) {
-  const res = await fetch(`${API_URL}/auth/register`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, name }),
-  });
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new ApiError(res.status, body, formatMessage(body));
+  try {
+    const { data } = await plainClient.post<{ accessToken: string }>(
+      "/auth/register",
+      { email, password, name },
+    );
+    return data;
+  } catch (e) {
+    if (axios.isAxiosError(e)) {
+      const status = e.response?.status ?? 0;
+      const body = e.response?.data;
+      throw new ApiError(status, body, formatMessage(body));
+    }
+    throw e;
   }
-  return body as { accessToken: string };
 }
 
 export async function logoutRequest() {
-  await fetch(`${API_URL}/auth/logout`, {
-    method: "GET",
-    credentials: "include",
-    headers: getAccessToken()
-      ? { Authorization: `Bearer ${getAccessToken()}` }
-      : undefined,
-  });
+  await apiClient.get("/auth/logout");
 }
 
 export async function fetchProfile(): Promise<User> {
@@ -149,14 +167,14 @@ export async function fetchProfile(): Promise<User> {
 export async function acceptInviteRequest(token: string) {
   return apiJson<{ message: string }>("/group/invite/accept", {
     method: "POST",
-    body: JSON.stringify({ token }),
+    data: { token },
   });
 }
 
 export async function declineInviteRequest(token: string) {
   return apiJson<{ message: string }>("/group/invite/decline", {
     method: "POST",
-    body: JSON.stringify({ token }),
+    data: { token },
   });
 }
 

@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { apiFetch, apiJson } from "@/lib/api";
+import { apiClient, apiJson } from "@/lib/api";
 import type { Assignment, AssignmentStatus, Paginated } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,11 +34,7 @@ export default function AssignmentsPage() {
     mutationFn: async (a: Assignment) => {
       const next: Assignment["status"] =
         a.status === "COMPLETED" ? "PENDING" : "COMPLETED";
-      const res = await apiFetch(`/assignment/${a.id}/status`, {
-        method: "PATCH",
-        body: JSON.stringify({ status: next }),
-      });
-      if (!res.ok) throw new Error(await res.text());
+      await apiClient.patch(`/assignment/${a.id}/status`, { status: next });
       return next;
     },
     onSuccess: () => {

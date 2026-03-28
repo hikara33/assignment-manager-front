@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { ApiError, apiFetch, apiJson } from "@/lib/api";
+import { ApiError, apiClient, apiJson } from "@/lib/api";
 import type { Assignment, AssignmentPriority } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,12 +46,12 @@ function AssignmentEditor({
     mutationFn: async () => {
       return apiJson<Assignment>(`/assignment/${assignmentId}`, {
         method: "PATCH",
-        body: JSON.stringify({
+        data: {
           title,
           description: description || undefined,
           dueDay: dueIso,
           priority,
-        }),
+        },
       });
     },
     onSuccess: () => {
@@ -67,10 +67,7 @@ function AssignmentEditor({
 
   const remove = useMutation({
     mutationFn: async () => {
-      const res = await apiFetch(`/assignment/${assignmentId}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error(await res.text());
+      await apiClient.delete(`/assignment/${assignmentId}`);
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["assignments"] });
@@ -80,11 +77,7 @@ function AssignmentEditor({
 
   const setStatus = useMutation({
     mutationFn: async (status: Assignment["status"]) => {
-      const res = await apiFetch(`/assignment/${assignmentId}/status`, {
-        method: "PATCH",
-        body: JSON.stringify({ status }),
-      });
-      if (!res.ok) throw new Error(await res.text());
+      await apiClient.patch(`/assignment/${assignmentId}/status`, { status });
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["assignment", assignmentId] });
