@@ -74,3 +74,9 @@ export type InvitePayload = {
   invitedById?: string;
   type?: string;
 };
+
+export type Conflict = {
+  date: string;
+  count: number;
+  tasks: Assignment[];
+};

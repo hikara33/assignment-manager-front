@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { apiJson } from "@/lib/api";
-import type { Assignment, DashboardStats } from "@/lib/types";
+import type { Assignment, Conflict, DashboardStats, Paginated } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -20,7 +20,7 @@ export default function DashboardPage() {
 
   const conflicts = useQuery({
     queryKey: ["conflicts"],
-    queryFn: () => apiJson<unknown>("/assignment/conflicts"),
+    queryFn: () => apiJson<Conflict[]>("/assignment/conflicts"),
   });
 
   const suggestions = useQuery({
@@ -112,14 +112,58 @@ export default function DashboardPage() {
         </Card>
 
         <Card>
-          <h2 className="text-lg font-semibold text-slate-900">
-            Конфликты дедлайнов
-          </h2>
-          <pre className="mt-3 max-h-64 overflow-auto rounded-lg bg-slate-50 p-3 text-xs text-slate-700">
-            {conflicts.isLoading
-              ? "…"
-              : JSON.stringify(conflicts.data, null, 2)}
-          </pre>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-slate-900">
+              Конфликты дедлайнов
+            </h2>
+
+            {!conflicts.isLoading && conflicts.data?.length ? (
+              <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+                {conflicts.data.length}
+              </span>
+            ) : null}
+          </div>
+
+          <div className="mt-3 max-h-64 overflow-auto">
+            {conflicts.isLoading ? (
+              <div className="text-sm text-slate-500">Загрузка...</div>
+            ) : !conflicts.data || conflicts.data.length === 0 ? (
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <span>✅</span>
+                <span>Конфликтов нет</span>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {conflicts.data.map((conflict) => (
+                  <div
+                    key={conflict.date}
+                    className="rounded-xl border border-red-200 bg-red-50 p-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium text-red-900">
+                        {conflict.tasks.map((t) => t.title).join(", ")}
+                      </div>
+                      <span className="text-xs text-red-600">⚠️</span>
+                    </div>
+
+                    <div className="mt-1 text-xs text-red-700">
+                      Количество задач: {conflict.count}
+                    </div>
+
+                    {conflict.date && (
+                      <div className="mt-2 text-xs text-red-600">
+                        📅 {new Date(conflict.date).toLocaleString("ru-RU", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </Card>
       </div>
 
