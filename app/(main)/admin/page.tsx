@@ -92,9 +92,9 @@ function AdminContent() {
           Администрирование
         </h1>
         <p className="text-slate-600">
-          Пользователи и предметы.{" "}
+          Пользователи и направления.{" "}
           <Link href="/dashboard" className="text-sky-700 hover:underline">
-            ← Дашборд
+            ← Dashboard
           </Link>
         </p>
       </div>
@@ -133,7 +133,7 @@ function AdminContent() {
       </Card>
 
       <Card>
-        <h2 className="text-lg font-semibold text-slate-900">Предметы</h2>
+        <h2 className="text-lg font-semibold text-slate-900">Направления</h2>
         <form
           className="mt-4 grid gap-3 sm:grid-cols-2"
           onSubmit={(e) => {
@@ -166,7 +166,7 @@ function AdminContent() {
             <p className="text-sm text-red-600 sm:col-span-2">{subErr}</p>
           )}
           <Button type="submit" disabled={createSubject.isPending}>
-            Добавить предмет
+            Добавить направление
           </Button>
         </form>
 

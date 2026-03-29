@@ -96,7 +96,7 @@ export default function AssignmentsPage() {
                   {a.title}
                 </Link>
                 <p className="text-sm text-slate-500">
-                  {a.subject?.name ?? "Предмет"} ·{" "}
+                  {a.subject?.name ?? "Направление"} ·{" "}
                   {formatDue(a.dueDay)} · {priorityRu(a.priority)}
                   {a.group?.name ? ` · ${a.group.name}` : ""}
                 </p>

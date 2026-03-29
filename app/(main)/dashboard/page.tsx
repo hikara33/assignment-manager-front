@@ -34,7 +34,7 @@ export default function DashboardPage() {
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Дашборд</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">Dashboard</h1>
           <p className="text-slate-600">Обзор заданий и подсказки</p>
         </div>
         <div className="flex gap-2">

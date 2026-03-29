@@ -50,16 +50,16 @@ export default function GroupsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Группы</h1>
+        <h1 className="text-2xl font-semibold text-slate-900">Команды</h1>
         <p className="text-slate-600">
           Участники и приглашения. Список ниже собран из ваших заданий с
-          привязкой к группам; только что созданная группа появится после
+          привязкой к командам; только что созданная команда появится после
           первого задания или приглашения.
         </p>
       </div>
 
       <Card>
-        <h2 className="text-lg font-semibold text-slate-900">Создать группу</h2>
+        <h2 className="text-lg font-semibold text-slate-900">Создать команду</h2>
         <form
           className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end"
           onSubmit={(e) => {
@@ -102,13 +102,13 @@ export default function GroupsPage() {
       </Card>
 
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-slate-900">Мои группы</h2>
+        <h2 className="text-lg font-semibold text-slate-900">Мои команды</h2>
         {groups.isLoading && <p className="text-slate-500">Загрузка…</p>}
         {groups.data?.length === 0 && !groups.isLoading && (
           <Card className="border-dashed border-sky-200 bg-sky-50/40">
             <p className="text-sm text-slate-600">
-              Пока нет групп с заданиями. Создайте группу выше и добавьте задание
-              с этой группой, либо примите приглашение по ссылке.
+              Пока нет команд с заданиями. Создайте команду выше и добавьте задание
+              с этой командой, либо примите приглашение по ссылке.
             </p>
           </Card>
         )}

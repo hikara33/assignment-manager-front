@@ -190,7 +190,7 @@ function AssignmentEditor({
 
       <Card className="bg-slate-50/80">
         <p className="text-sm text-slate-600">
-          Предмет: <strong>{a.subjectId}</strong> (id; название в списке
+          Направление: <strong>{a.subjectId}</strong> (id; название в списке
           заданий)
         </p>
         <p className="text-sm text-slate-600">

@@ -7,9 +7,9 @@ import { logoutRequest } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 const nav = [
-  { href: "/dashboard", label: "Дашборд" },
+  { href: "/dashboard", label: "Dashboard" },
   { href: "/assignments", label: "Задания" },
-  { href: "/groups", label: "Группы" },
+  { href: "/groups", label: "Команды" },
   { href: "/profile", label: "Профиль" },
 ];
 

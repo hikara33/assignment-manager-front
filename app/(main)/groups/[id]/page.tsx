@@ -109,7 +109,7 @@ export default function GroupDetailPage() {
           href="/groups"
           className="text-sm font-medium text-sky-700 hover:underline"
         >
-          ← Все группы
+          ← Все команды
         </Link>
         <h1 className="mt-2 text-2xl font-semibold text-slate-900">{groupName}</h1>
         <p className="font-mono text-xs text-slate-400">{id}</p>
@@ -161,7 +161,7 @@ export default function GroupDetailPage() {
       {myRole === "OWNER" && (members.data?.length ?? 0) > 1 && (
         <Card>
           <h2 className="text-lg font-semibold text-slate-900">
-            Передать владение
+            Поделиться правами
           </h2>
           <form
             className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end"
@@ -233,11 +233,11 @@ export default function GroupDetailPage() {
           type="button"
           variant="secondary"
           onClick={() => {
-            if (confirm("Выйти из группы?")) leave.mutate();
+            if (confirm("Выйти из команды?")) leave.mutate();
           }}
           disabled={leave.isPending || !myRole}
         >
-          Выйти из группы
+          Выйти из команды
         </Button>
         {myRole === "OWNER" && (
           <Button
@@ -246,7 +246,7 @@ export default function GroupDetailPage() {
             onClick={() => {
               if (
                 confirm(
-                  "Удалить группу полностью? Это действие необратимо для связанных данных.",
+                  "Удалить команду полностью? Это действие необратимо для связанных данных.",
                 )
               ) {
                 removeGroup.mutate();
@@ -254,7 +254,7 @@ export default function GroupDetailPage() {
             }}
             disabled={removeGroup.isPending}
           >
-            Удалить группу
+            Удалить команду
           </Button>
         )}
       </div>
