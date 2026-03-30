@@ -80,3 +80,10 @@ export type Conflict = {
   count: number;
   tasks: Assignment[];
 };
+
+export type SuggestReschedule = {
+  taskId: string;
+  taskTitle: string;
+  from: string;
+  to: string;
+}

@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { apiJson } from "@/lib/api";
-import type { Assignment, Conflict, DashboardStats, Paginated } from "@/lib/types";
+import type { Assignment, Conflict, DashboardStats, Paginated, SuggestReschedule } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -25,7 +25,7 @@ export default function DashboardPage() {
 
   const suggestions = useQuery({
     queryKey: ["reschedule"],
-    queryFn: () => apiJson<unknown>("/assignment/reschedule-suggestions"),
+    queryFn: () => apiJson<SuggestReschedule[]>("/assignment/reschedule-suggestions"),
   });
 
   const s = stats.data;
@@ -171,11 +171,52 @@ export default function DashboardPage() {
         <h2 className="text-lg font-semibold text-slate-900">
           Рекомендации по переносу
         </h2>
-        <pre className="mt-3 max-h-64 overflow-auto rounded-lg bg-slate-50 p-3 text-xs text-slate-700">
-          {suggestions.isLoading
-            ? "…"
-            : JSON.stringify(suggestions.data, null, 2)}
-        </pre>
+
+        <div className="mt-3 max-h-64 overflow-auto">
+          {suggestions.isLoading ? (
+            <div className="text-sm text-slate-500">Загрузка...</div>
+          ) : !suggestions.data || suggestions.data.length === 0 ? (
+            <div className="flex items-center gap-2 text-sm text-slate-500">
+              <span>✅</span>
+              <span>Перенос не требуется</span>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {suggestions.data?.map((s) => (
+                <div
+                  key={s.taskId}
+                  className="rounded-xl border border-sky-200 bg-sky-50 p-3"
+                >
+                  <div className="font-medium text-slate-900">
+                    {s.taskTitle}
+                  </div>
+
+                  <div className="mt-1 text-xs text-slate-600">
+                    Перенести:
+                  </div>
+
+                  <div className="mt-1 flex items-center gap-2 text-xs">
+                    <span className="text-red-600">
+                      {new Date(s.from).toLocaleDateString("ru-RU", {
+                        day: "numeric",
+                        month: "short",
+                      })}
+                    </span>
+
+                    <span className="text-slate-400">→</span>
+
+                    <span className="text-emerald-600">
+                      {new Date(s.to).toLocaleDateString("ru-RU", {
+                        day: "numeric",
+                        month: "short",
+                      })}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </Card>
     </div>
   );
