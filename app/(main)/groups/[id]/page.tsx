@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { ApiError, apiClient, apiJson } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
-import type { Assignment, GroupMemberRow, Paginated } from "@/lib/types";
+import type { Assignment, Group, GroupMemberRow, Paginated } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,16 +18,13 @@ export default function GroupDetailPage() {
   const qc = useQueryClient();
   const me = useAuthStore((s) => s.user);
 
-  const header = useQuery({
-    queryKey: ["group-label", id],
-    queryFn: () =>
-      apiJson<Paginated<Assignment>>(
-        `/assignment?groupId=${encodeURIComponent(id)}&limit=1`,
-      ),
+  const group = useQuery({
+    queryKey: ["group", id],
+    queryFn: () => apiJson<Group>(`/group/${id}`),
     enabled: !!id,
   });
 
-  const groupName = header.data?.data[0]?.group?.name ?? `Группа ${id.slice(0, 8)}…`;
+  const groupName = group.data?.name ?? `Группа ${id.slice(0, 8)}…`;
 
   const members = useQuery({
     queryKey: ["group-members", id],

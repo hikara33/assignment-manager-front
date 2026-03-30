@@ -10,14 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 async function fetchMyGroups(): Promise<Group[]> {
-  const res = await apiJson<Paginated<Assignment>>(
-    "/assignment?limit=300&page=1",
-  );
-  const map = new Map<string, Group>();
-  for (const a of res.data) {
-    if (a.group) map.set(a.group.id, a.group);
-  }
-  return Array.from(map.values());
+  return apiJson<Group[]>("/group/my");
 }
 
 export default function GroupsPage() {
