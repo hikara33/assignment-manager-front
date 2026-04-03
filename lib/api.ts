@@ -164,6 +164,30 @@ export async function fetchProfile(): Promise<User> {
   return apiJson<User>("/auth/profile");
 }
 
+export type InvitePreview = {
+  email: string;
+  groupId: string;
+  groupName: string;
+  userRegistered: boolean;
+};
+
+export async function getInvitePreview(token: string): Promise<InvitePreview> {
+  try {
+    const { data } = await plainClient.get<InvitePreview>(
+      "/group/invite/preview",
+      { params: { token } },
+    );
+    return data;
+  } catch (e) {
+    if (axios.isAxiosError(e)) {
+      const status = e.response?.status ?? 0;
+      const body = e.response?.data;
+      throw new ApiError(status, body, formatMessage(body));
+    }
+    throw e;
+  }
+}
+
 export async function acceptInviteRequest(token: string) {
   return apiJson<{ message: string }>("/group/invite/accept", {
     method: "POST",
