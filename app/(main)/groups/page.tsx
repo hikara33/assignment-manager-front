@@ -46,8 +46,7 @@ export default function GroupsPage() {
         <h1 className="text-2xl font-semibold text-slate-900">Команды</h1>
         <p className="text-slate-600">
           Участники и приглашения. Список ниже собран из ваших заданий с
-          привязкой к командам; только что созданная команда появится после
-          первого задания или приглашения.
+          привязкой к командам
         </p>
       </div>
 
@@ -119,7 +118,7 @@ export default function GroupsPage() {
               </div>
               <Link href={`/groups/${g.id}`}>
                 <Button type="button" variant="secondary">
-                  Участники
+                  Подробнее
                 </Button>
               </Link>
             </div>

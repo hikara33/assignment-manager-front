@@ -26,6 +26,12 @@ export default function GroupDetailPage() {
 
   const groupName = group.data?.name ?? `Группа ${id.slice(0, 8)}…`;
 
+  const groupAssignments = useQuery({
+    queryKey: ["group-assignments", id],
+    queryFn: () => apiJson<Paginated<Assignment>>(`/assignment/group/${id}`),
+    enabled: !!id,
+  });
+
   const members = useQuery({
     queryKey: ["group-members", id],
     queryFn: () => apiJson<GroupMemberRow[]>(`/group/${id}/members`),
@@ -188,6 +194,44 @@ export default function GroupDetailPage() {
           </form>
         </Card>
       )}
+
+      <Card>
+        <h2 className="text-lg font-semibold text-slate-900">Задачи команды</h2>
+
+        {groupAssignments.isLoading && <p>Загрузка…</p>}
+
+        {groupAssignments.isError && (
+          <p className="text-red-600">Ошибка загрузки списка задач</p>
+        )}
+
+        {!groupAssignments.isLoading && !groupAssignments.isError && (
+          <>
+            {groupAssignments.data?.data.length ? (
+              <ul className="mt-4 space-y-2">
+                {groupAssignments.data.data.map((a) => (
+                  <li key={a.id}>
+                    <Link
+                      href={`/assignments/${a.id}`}
+                      className="text-sky-700 hover:underline"
+                    >
+                      {a.title} ({a.subject?.name ?? "Направление"})
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="mt-4 text-center text-slate-500">
+                <p>У команды пока нет задач.</p>
+                <Link href="/assignments/new">
+                  <Button className="mt-2">
+                    Создать первую задачу
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </>
+        )}
+      </Card>
 
       <Card>
         <h2 className="text-lg font-semibold text-slate-900">Участники</h2>
