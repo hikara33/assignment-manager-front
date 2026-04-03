@@ -46,7 +46,7 @@ export default function GroupDetailPage() {
 
   const [email, setEmail] = useState("");
   const [inviteErr, setInviteErr] = useState<string | null>(null);
-  const [ownerPick, setOwnerPick] = useState("");
+  const [transferErr, setTransferErr] = useState<string | null>(null);
 
   const invite = useMutation({
     mutationFn: () =>
@@ -93,15 +93,20 @@ export default function GroupDetailPage() {
   });
 
   const transfer = useMutation({
-    mutationFn: async () => {
-      return apiJson(`/group/${id}/owner`, {
+    mutationFn: (newOwnerUserId: string) =>
+      apiJson(`/group/${id}/owner`, {
         method: "PATCH",
-        data: { newOwner: ownerPick },
-      });
-    },
+        data: { newOwner: newOwnerUserId },
+      }),
     onSuccess: () => {
-      setOwnerPick("");
+      setTransferErr(null);
       void members.refetch();
+      void qc.invalidateQueries({ queryKey: ["group", id] });
+    },
+    onError: (e) => {
+      setTransferErr(
+        e instanceof ApiError ? e.message : "Не удалось передать роль",
+      );
     },
   });
 
@@ -160,41 +165,7 @@ export default function GroupDetailPage() {
           )}
         </Card>
       )}
-
-      {myRole === "OWNER" && (members.data?.length ?? 0) > 1 && (
-        <Card>
-          <h2 className="text-lg font-semibold text-slate-900">
-            Поделиться правами
-          </h2>
-          <form
-            className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end"
-            onSubmit={(e) => {
-              e.preventDefault();
-              transfer.mutate();
-            }}
-          >
-            <select
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm sm:max-w-md"
-              value={ownerPick}
-              required
-              onChange={(e) => setOwnerPick(e.target.value)}
-            >
-              <option value="">Выберите участника…</option>
-              {members.data
-                ?.filter((m) => m.userId !== me?.id && m.role !== "OWNER")
-                .map((m) => (
-                  <option key={m.userId} value={m.userId}>
-                    {m.user.name} ({m.user.email})
-                  </option>
-                ))}
-            </select>
-            <Button type="submit" variant="secondary" disabled={transfer.isPending}>
-              Передать
-            </Button>
-          </form>
-        </Card>
-      )}
-
+      
       <Card>
         <h2 className="text-lg font-semibold text-slate-900">Задачи команды</h2>
 
@@ -249,21 +220,42 @@ export default function GroupDetailPage() {
                   {m.role === "OWNER" ? "Владелец" : "Участник"}
                 </p>
               </div>
-              {myRole === "OWNER" &&
-                m.userId !== me?.id &&
-                m.role !== "OWNER" && (
-                  <Button
-                    type="button"
-                    variant="danger"
-                    onClick={() => {
-                      if (confirm(`Удалить ${m.user.name} из группы?`)) {
-                        kick.mutate(m.userId);
-                      }
-                    }}
-                  >
-                    Удалить
-                  </Button>
-                )}
+              {myRole === "OWNER" && m.userId !== me?.id && (
+                <div className="flex flex-wrap gap-2">
+                  {m.role !== "OWNER" && (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      disabled={transfer.isPending}
+                      onClick={() => {
+                        if (
+                          confirm(
+                            `Сделать «${m.user.name}» совладельцем? Вы оба будете владельцами команды.`,
+                          )
+                        ) {
+                          transfer.mutate(m.userId);
+                        }
+                      }}
+                    >
+                      Совладелец
+                    </Button>
+                  )}
+                  {m.role !== "OWNER" && (
+                    <Button
+                      type="button"
+                      variant="danger"
+                      disabled={kick.isPending}
+                      onClick={() => {
+                        if (confirm(`Удалить ${m.user.name} из группы?`)) {
+                          kick.mutate(m.userId);
+                        }
+                      }}
+                    >
+                      Удалить
+                    </Button>
+                  )}
+                </div>
+              )}
             </li>
           ))}
         </ul>
