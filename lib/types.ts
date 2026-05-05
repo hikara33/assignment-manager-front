@@ -43,6 +43,17 @@ export type Assignment = {
   updatedAt?: string;
 };
 
+/** Мета с бэкенда (PriorityResolverService.getMeta) + score сортировки */
+export type PrioritizedAssignmentMeta = {
+  daysLeft?: number;
+  isOverdue?: boolean;
+  isDueToday?: boolean;
+  isDueSoon?: boolean;
+  score?: number;
+};
+
+export type PrioritizedAssignment = Assignment & PrioritizedAssignmentMeta;
+
 export type Paginated<T> = {
   data: T[];
   meta: {

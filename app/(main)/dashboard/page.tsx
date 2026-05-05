@@ -3,9 +3,16 @@
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { apiJson } from "@/lib/api";
-import type { Assignment, Conflict, DashboardStats, Paginated, SuggestReschedule } from "@/lib/types";
+import { maxPrioritizedScore, prioritizedTaskRowClasses } from "@/lib/prioritized";
+import type {
+  Conflict,
+  DashboardStats,
+  PrioritizedAssignment,
+  SuggestReschedule,
+} from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function DashboardPage() {
   const stats = useQuery({
@@ -15,7 +22,7 @@ export default function DashboardPage() {
 
   const prioritized = useQuery({
     queryKey: ["prioritized"],
-    queryFn: () => apiJson<Assignment[]>("/assignment/prioritized"),
+    queryFn: () => apiJson<PrioritizedAssignment[]>("/assignment/prioritized"),
   });
 
   const conflicts = useQuery({
@@ -29,6 +36,7 @@ export default function DashboardPage() {
   });
 
   const s = stats.data;
+  const topPrioritizedScore = maxPrioritizedScore(prioritized.data);
 
   return (
     <div className="space-y-8">
@@ -81,24 +89,33 @@ export default function DashboardPage() {
           <h2 className="text-lg font-semibold text-slate-900">
             Приоритетные задания
           </h2>
-          <p className="text-sm text-slate-500">Топ задач по алгоритму бэкенда</p>
+          <p className="text-sm text-slate-500">
+            Красным — самые срочные, жёлтым —
+            просроченные.
+          </p>
           <ul className="mt-4 space-y-2">
             {prioritized.isLoading && (
               <li className="text-sm text-slate-500">Загрузка…</li>
             )}
-            {prioritized.data?.slice(0, 8).map((a) => (
-              <li key={a.id}>
-                <Link
-                  href={`/assignments/${a.id}`}
-                  className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50/50 px-3 py-2 text-sm hover:bg-sky-50"
-                >
-                  <span className="font-medium text-slate-800">{a.title}</span>
-                  <span className="text-xs text-slate-500">
-                    {formatDue(a.dueDay)}
-                  </span>
-                </Link>
-              </li>
-            ))}
+            {prioritized.data?.slice(0, 8).map((a) => {
+              const row = prioritizedTaskRowClasses(a, topPrioritizedScore);
+              return (
+                <li key={a.id}>
+                  <Link
+                    href={`/assignments/${a.id}`}
+                    className={cn(
+                      "flex items-center justify-between rounded-lg border px-3 py-2 text-sm transition-colors",
+                      row.link,
+                    )}
+                  >
+                    <span className={cn("font-medium", row.title)}>{a.title}</span>
+                    <span className={cn("text-xs tabular-nums", row.due)}>
+                      {formatDue(a.dueDay)}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
             {prioritized.data?.length === 0 && (
               <li className="text-sm text-slate-500">Пока нет заданий</li>
             )}
