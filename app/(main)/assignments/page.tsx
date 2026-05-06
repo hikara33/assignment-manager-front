@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import Link from "next/link";
 import { apiClient, apiJson } from "@/lib/api";
 import type { Assignment, AssignmentStatus, Paginated } from "@/lib/types";
@@ -8,6 +8,7 @@ import { ASSIGNMENTS_PAGE_SIZE, totalPages } from "@/lib/pagination";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import { useAssignmentsQuery } from "@/lib/queries/assignments";
 
 const statuses: { value: AssignmentStatus | ""; label: string }[] = [
   { value: "", label: "Все" },
@@ -23,27 +24,28 @@ export default function AssignmentsPage() {
   const queryClient = useQueryClient();
 
   const list = useQuery({
-    queryKey: ["assignments", status, page],
-    queryFn: async () => {
-      const q = new URLSearchParams({
-        page: String(page),
-        limit: String(ASSIGNMENTS_PAGE_SIZE),
-      });
-      if (status) q.set("status", status);
-      return apiJson<Paginated<Assignment>>(`/assignment?${q}`);
-    },
+    ...useAssignmentsQuery(status, page),
+    placeholderData: keepPreviousData,
   });
 
-  // const listTotal = list.data?.meta.total ?? 0;
   const meta = list.data?.meta;
   console.log(meta);
-  
+
+  useEffect(() => {
+    if (!meta?.hasNextPage) return;
+
+    void queryClient.prefetchQuery(
+      useAssignmentsQuery(status, page + 1),
+    );
+  }, [meta, page, status, queryClient]);
 
   const toggleDone = useMutation({
     mutationFn: async (a: Assignment) => {
       const next: Assignment["status"] =
         a.status === "COMPLETED" ? "PENDING" : "COMPLETED";
+
       await apiClient.patch(`/assignment/${a.id}/status`, { status: next });
+
       return next;
     },
     onSuccess: () => {
@@ -74,11 +76,10 @@ export default function AssignmentsPage() {
               setPage(1);
               setStatus(s.value);
             }}
-            className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
-              status === s.value
+            className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${status === s.value
                 ? "bg-sky-600 text-white"
                 : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
-            }`}
+              }`}
           >
             {s.label}
           </button>
@@ -117,20 +118,22 @@ export default function AssignmentsPage() {
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <span
-                  className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                    a.status === "COMPLETED"
+                  className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${a.status === "COMPLETED"
                       ? "bg-emerald-100 text-emerald-800"
                       : a.status === "OVERDUE"
                         ? "bg-amber-100 text-amber-900"
                         : "bg-slate-100 text-slate-700"
-                  }`}
+                    }`}
                 >
                   {statusRu(a.status)}
                 </span>
                 <Button
                   type="button"
                   variant={a.status === "COMPLETED" ? "secondary" : "primary"}
-                  disabled={toggleDone.isPending}
+                  disabled={
+                    toggleDone.isPending &&
+                    toggleDone.variables.id === a.id
+                  }
                   onClick={() => toggleDone.mutate(a)}
                 >
                   {a.status === "COMPLETED" ? "Вернуть в работу" : "Выполнено"}
