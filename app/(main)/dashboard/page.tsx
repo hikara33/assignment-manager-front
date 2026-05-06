@@ -93,11 +93,11 @@ export default function DashboardPage() {
             Красным — самые срочные, жёлтым —
             просроченные.
           </p>
-          <ul className="mt-4 space-y-2">
+          <ul className="mt-4 max-h-72 space-y-2 overflow-y-auto pr-1 [scrollbar-gutter:stable]">
             {prioritized.isLoading && (
               <li className="text-sm text-slate-500">Загрузка…</li>
             )}
-            {prioritized.data?.slice(0, 8).map((a) => {
+            {prioritized.data?.map((a) => {
               const row = prioritizedTaskRowClasses(a, topPrioritizedScore);
               return (
                 <li key={a.id}>
@@ -129,19 +129,24 @@ export default function DashboardPage() {
         </Card>
 
         <Card>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <h2 className="text-lg font-semibold text-slate-900">
               Конфликты дедлайнов
             </h2>
 
             {!conflicts.isLoading && conflicts.data?.length ? (
-              <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+              <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
                 {conflicts.data.length}
               </span>
             ) : null}
           </div>
+          <p className="mt-2 border-l-2 border-slate-200 pl-3 text-xs leading-relaxed text-slate-500">
+            Здесь видны дни, когда на вас сразу сходится много дедлайнов. Это
+            сигнал разнести работу по времени или перенести часть задач, чтобы не
+            всё горело одной датой.
+          </p>
 
-          <div className="mt-3 max-h-64 overflow-auto">
+          <div className="mt-3 max-h-64 overflow-y-auto pr-1 [scrollbar-gutter:stable]">
             {conflicts.isLoading ? (
               <div className="text-sm text-slate-500">Загрузка...</div>
             ) : !conflicts.data || conflicts.data.length === 0 ? (
@@ -188,8 +193,13 @@ export default function DashboardPage() {
         <h2 className="text-lg font-semibold text-slate-900">
           Рекомендации по переносу
         </h2>
+        <p className="mt-2 border-l-2 border-slate-200 pl-3 text-xs leading-relaxed text-slate-500">
+          Подсказки, как сдвинуть сроки отдельных заданий, если дедлайны
+          пересекаются или нагрузка в один день слишком высокая. Можно ориентироваться
+          на них при планировании; сами даты вы всё равно меняете в карточке задания.
+        </p>
 
-        <div className="mt-3 max-h-64 overflow-auto">
+        <div className="mt-3 max-h-64 overflow-y-auto pr-1 [scrollbar-gutter:stable]">
           {suggestions.isLoading ? (
             <div className="text-sm text-slate-500">Загрузка...</div>
           ) : !suggestions.data || suggestions.data.length === 0 ? (
