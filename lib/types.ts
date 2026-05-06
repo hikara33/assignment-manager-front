@@ -59,7 +59,10 @@ export type Paginated<T> = {
   meta: {
     total: number;
     page: number;
+    limit: number;
     lastPage: number;
+    hasNextPage: boolean;
+    hasPrevPage:boolean;
   };
 };
 

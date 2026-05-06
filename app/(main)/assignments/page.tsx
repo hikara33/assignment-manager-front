@@ -4,9 +4,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { apiClient, apiJson } from "@/lib/api";
 import type { Assignment, AssignmentStatus, Paginated } from "@/lib/types";
+import { ASSIGNMENTS_PAGE_SIZE, totalPages } from "@/lib/pagination";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const statuses: { value: AssignmentStatus | ""; label: string }[] = [
   { value: "", label: "Все" },
@@ -24,11 +25,19 @@ export default function AssignmentsPage() {
   const list = useQuery({
     queryKey: ["assignments", status, page],
     queryFn: async () => {
-      const q = new URLSearchParams({ page: String(page), limit: "12" });
+      const q = new URLSearchParams({
+        page: String(page),
+        limit: String(ASSIGNMENTS_PAGE_SIZE),
+      });
       if (status) q.set("status", status);
       return apiJson<Paginated<Assignment>>(`/assignment?${q}`);
     },
   });
+
+  // const listTotal = list.data?.meta.total ?? 0;
+  const meta = list.data?.meta;
+  console.log(meta);
+  
 
   const toggleDone = useMutation({
     mutationFn: async (a: Assignment) => {
@@ -132,23 +141,25 @@ export default function AssignmentsPage() {
         ))}
       </div>
 
-      {list.data && list.data.meta.lastPage > 1 && (
-        <div className="flex items-center justify-center gap-4">
+      {list.data && meta && (
+        <div className="flex flex-wrap items-center justify-center gap-4">
           <Button
             type="button"
             variant="secondary"
-            disabled={page <= 1}
+            disabled={!meta.hasPrevPage}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
           >
             Назад
           </Button>
-          <span className="text-sm text-slate-600">
-            Стр. {page} / {list.data.meta.lastPage}
+          <span className="text-sm tabular-nums text-slate-600">
+            Стр. {meta.page} из {meta.lastPage}
+            <span className="text-slate-400"> · </span>
+            <span className="text-slate-500">всего {meta.total}</span>
           </span>
           <Button
             type="button"
             variant="secondary"
-            disabled={page >= list.data.meta.lastPage}
+            disabled={!meta.hasNextPage}
             onClick={() => setPage((p) => p + 1)}
           >
             Далее
