@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import { ASSIGNMENTS_QUERY_KEY } from "@/lib/queries/assignments";
 
 function useMyGroups() {
   return useQuery({
@@ -65,8 +66,9 @@ export default function NewAssignmentPage() {
       });
     },
     onSuccess: (a) => {
-      void qc.invalidateQueries({ queryKey: ["assignments"] });
+      void qc.invalidateQueries({ queryKey: [ASSIGNMENTS_QUERY_KEY] });
       void qc.invalidateQueries({ queryKey: ["dashboard"] });
+      void qc.invalidateQueries({ queryKey: ["prioritized"] });
       router.push(`/assignments/${a.id}`);
     },
     onError: (err) => {

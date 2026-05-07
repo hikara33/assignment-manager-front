@@ -8,7 +8,10 @@ import { ASSIGNMENTS_PAGE_SIZE, totalPages } from "@/lib/pagination";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { useAssignmentsQuery } from "@/lib/queries/assignments";
+import {
+  ASSIGNMENTS_QUERY_KEY,
+  useAssignmentsQuery,
+} from "@/lib/queries/assignments";
 
 const statuses: { value: AssignmentStatus | ""; label: string }[] = [
   { value: "", label: "Все" },
@@ -49,7 +52,7 @@ export default function AssignmentsPage() {
       return next;
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["assignments"] });
+      void queryClient.invalidateQueries({ queryKey: [ASSIGNMENTS_QUERY_KEY] });
       void queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       void queryClient.invalidateQueries({ queryKey: ["prioritized"] });
     },
