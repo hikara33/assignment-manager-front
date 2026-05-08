@@ -214,8 +214,15 @@ export default function DashboardPage() {
                   key={s.taskId}
                   className="rounded-xl border border-sky-200 bg-sky-50 p-3"
                 >
-                  <div className="font-medium text-slate-900">
-                    {s.taskTitle}
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="font-medium text-slate-900">
+                      {s.taskTitle}
+                    </div>
+                    {s.priority && (
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
+                        {priorityRu(s.priority)}
+                      </span>
+                    )}
                   </div>
 
                   <div className="mt-1 text-xs text-slate-600">
@@ -239,6 +246,11 @@ export default function DashboardPage() {
                       })}
                     </span>
                   </div>
+                  {s.reason && (
+                    <div className="mt-2 text-xs text-slate-500">
+                      Причина: {reasonRu(s.reason)}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -290,4 +302,21 @@ function formatDue(iso: string) {
   } catch {
     return iso;
   }
+}
+
+function priorityRu(p: "LOW" | "MEDIUM" | "HIGH" | "URGENT") {
+  const m = {
+    LOW: "низкий",
+    MEDIUM: "средний",
+    HIGH: "высокий",
+    URGENT: "срочный",
+  } as const;
+  return m[p] ?? p;
+}
+
+function reasonRu(reason: string) {
+  if (reason === "Reduce workload on overloaded day") {
+    return "Снизить нагрузку в перегруженный день";
+  }
+  return reason;
 }

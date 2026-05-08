@@ -98,6 +98,8 @@ export type Conflict = {
 export type SuggestReschedule = {
   taskId: string;
   taskTitle: string;
+  priority?: AssignmentPriority;
   from: string;
   to: string;
-}
+  reason?: string;
+};
