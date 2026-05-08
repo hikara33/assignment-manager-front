@@ -1,8 +1,8 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { apiJson } from "@/lib/api";
+import { apiClient, apiJson, ApiError } from "@/lib/api";
 import { maxPrioritizedScore, prioritizedTaskRowClasses } from "@/lib/prioritized";
 import type {
   Conflict,
@@ -13,8 +13,11 @@ import type {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 export default function DashboardPage() {
+  const queryClient = useQueryClient();
+
   const stats = useQuery({
     queryKey: ["dashboard"],
     queryFn: () => apiJson<DashboardStats>("/assignment/dashboard"),
@@ -37,6 +40,27 @@ export default function DashboardPage() {
 
   const s = stats.data;
   const topPrioritizedScore = maxPrioritizedScore(prioritized.data);
+  const [rescheduleError, setRescheduleError] = useState<string | null>(null);
+
+  const rescheduleMutation = useMutation({
+    mutationFn: async (p: { taskId: string; to: string }) => {
+      return apiClient.patch(`/assignment/${p.taskId}/reschedule`, {
+        to: p.to,
+      });
+    },
+    onSuccess: () => {
+      setRescheduleError(null);
+      void queryClient.invalidateQueries({ queryKey: ["reschedule"] });
+      void queryClient.invalidateQueries({ queryKey: ["prioritized"] });
+      void queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      void queryClient.invalidateQueries({ queryKey: ["assignments"] });
+    },
+    onError: (err) => {
+      setRescheduleError(
+        err instanceof ApiError ? err.message : "Ошибка переноса",
+      );
+    },
+  });
 
   return (
     <div className="space-y-8">
@@ -200,6 +224,11 @@ export default function DashboardPage() {
         </p>
 
         <div className="mt-3 max-h-64 overflow-y-auto pr-1 [scrollbar-gutter:stable]">
+          {rescheduleError && (
+            <div className="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+              {rescheduleError}
+            </div>
+          )}
           {suggestions.isLoading ? (
             <div className="text-sm text-slate-500">Загрузка...</div>
           ) : !suggestions.data || suggestions.data.length === 0 ? (
@@ -251,6 +280,28 @@ export default function DashboardPage() {
                       Причина: {reasonRu(s.reason)}
                     </div>
                   )}
+
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() =>
+                        rescheduleMutation.mutate({
+                          taskId: s.taskId,
+                          to: normalizeDateOnly(s.to),
+                        })
+                      }
+                      disabled={
+                        rescheduleMutation.isPending &&
+                        rescheduleMutation.variables?.taskId === s.taskId
+                      }
+                    >
+                      {rescheduleMutation.isPending &&
+                      rescheduleMutation.variables?.taskId === s.taskId
+                        ? "Переносим..."
+                        : "Подтвердить перенос"}
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -319,4 +370,13 @@ function reasonRu(reason: string) {
     return "Снизить нагрузку в перегруженный день";
   }
   return reason;
+}
+
+function normalizeDateOnly(isoOrDate: string) {
+  // В бэкенд передаём формат YYYY-MM-DD.
+  if (/^\d{4}-\d{2}-\d{2}$/.test(isoOrDate)) return isoOrDate;
+
+  const d = new Date(isoOrDate);
+  if (Number.isNaN(d.getTime())) return isoOrDate;
+  return d.toISOString().slice(0, 10);
 }
