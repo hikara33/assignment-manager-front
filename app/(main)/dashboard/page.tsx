@@ -2,21 +2,26 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { apiClient, apiJson, ApiError } from "@/lib/api";
+import { apiJson, ApiError } from "@/lib/api";
+import { useAuthStore } from "@/lib/auth-store";
+import { canRescheduleByRole, fetchMyRolesInGroups } from "@/lib/group-roles";
 import { maxPrioritizedScore, prioritizedTaskRowClasses } from "@/lib/prioritized";
 import type {
+  Assignment,
   Conflict,
   DashboardStats,
+  Paginated,
   PrioritizedAssignment,
   SuggestReschedule,
 } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export default function DashboardPage() {
   const queryClient = useQueryClient();
+  const me = useAuthStore((s) => s.user);
 
   const stats = useQuery({
     queryKey: ["dashboard"],
@@ -38,27 +43,58 @@ export default function DashboardPage() {
     queryFn: () => apiJson<SuggestReschedule[]>("/assignment/reschedule-suggestions"),
   });
 
+  const assignmentLookup = useQuery({
+    queryKey: ["assignments", "lookup"],
+    queryFn: async () => {
+      const res = await apiJson<Paginated<Assignment>>(
+        "/assignment?limit=200&page=1",
+      );
+      return new Map(res.data.map((a) => [a.id, a]));
+    },
+    enabled: (suggestions.data?.length ?? 0) > 0,
+  });
+
+  const groupIdsInSuggestions = useMemo(() => {
+    if (!suggestions.data?.length) return [];
+    const ids = new Set<string>();
+    for (const item of suggestions.data) {
+      const fromSuggestion = item.groupId;
+      if (fromSuggestion) {
+        ids.add(fromSuggestion);
+        continue;
+      }
+      const fromAssignment = assignmentLookup.data?.get(item.taskId)?.groupId;
+      if (fromAssignment) ids.add(fromAssignment);
+    }
+    return [...ids];
+  }, [suggestions.data, assignmentLookup.data]);
+
+  const myGroupRoles = useQuery({
+    queryKey: ["my-group-roles", me?.id, groupIdsInSuggestions],
+    queryFn: () => fetchMyRolesInGroups(groupIdsInSuggestions, me!.id),
+    enabled: !!me?.id && groupIdsInSuggestions.length > 0,
+  });
+
   const s = stats.data;
   const topPrioritizedScore = maxPrioritizedScore(prioritized.data);
   const [rescheduleError, setRescheduleError] = useState<string | null>(null);
 
   const rescheduleMutation = useMutation({
-    mutationFn: async (p: { taskId: string; to: string }) => {
-      return apiClient.patch(`/assignment/${p.taskId}/reschedule`, {
-        to: p.to,
-      });
-    },
+    mutationFn: (p: { taskId: string; to: string }) =>
+      apiJson(`/assignment/${p.taskId}/reschedule`, {
+        method: "PATCH",
+        data: { to: p.to },
+      }),
     onSuccess: () => {
       setRescheduleError(null);
       void queryClient.invalidateQueries({ queryKey: ["reschedule"] });
       void queryClient.invalidateQueries({ queryKey: ["prioritized"] });
       void queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       void queryClient.invalidateQueries({ queryKey: ["assignments"] });
+      void queryClient.invalidateQueries({ queryKey: ["assignments", "lookup"] });
     },
     onError: (err) => {
-      setRescheduleError(
-        err instanceof ApiError ? err.message : "Ошибка переноса",
-      );
+      setRescheduleError(rescheduleErrorMessage(err));
     },
   });
 
@@ -218,9 +254,9 @@ export default function DashboardPage() {
           Рекомендации по переносу
         </h2>
         <p className="mt-2 border-l-2 border-slate-200 pl-3 text-xs leading-relaxed text-slate-500">
-          Подсказки, как сдвинуть сроки отдельных заданий, если дедлайны
-          пересекаются или нагрузка в один день слишком высокая. Можно ориентироваться
-          на них при планировании; сами даты вы всё равно меняете в карточке задания.
+          Подсказки, как сдвинуть сроки, если дедлайны пересекаются или день
+          перегружен. Личные задания можно перенести сразу по кнопке; для заданий
+          команды — только владелец группы.
         </p>
 
         <div className="mt-3 max-h-64 overflow-y-auto pr-1 [scrollbar-gutter:stable]">
@@ -238,20 +274,40 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {suggestions.data?.map((s) => (
+              {suggestions.data?.map((item) => {
+                const assignment = assignmentLookup.data?.get(item.taskId);
+                const groupId = item.groupId ?? assignment?.groupId ?? null;
+                const groupName = assignment?.group?.name;
+                const isGroupTask = !!groupId;
+                const canReschedule = canRescheduleByRole(
+                  groupId,
+                  myGroupRoles.data,
+                );
+                const rolesLoading =
+                  isGroupTask &&
+                  (assignmentLookup.isLoading || myGroupRoles.isLoading);
+
+                return (
                 <div
-                  key={s.taskId}
+                  key={item.taskId}
                   className="rounded-xl border border-sky-200 bg-sky-50 p-3"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="font-medium text-slate-900">
-                      {s.taskTitle}
+                      {item.taskTitle}
                     </div>
-                    {s.priority && (
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
-                        {priorityRu(s.priority)}
-                      </span>
-                    )}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {isGroupTask && (
+                        <span className="rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-800">
+                          Команда{groupName ? `: ${groupName}` : ""}
+                        </span>
+                      )}
+                      {item.priority && (
+                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
+                          {priorityRu(item.priority)}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <div className="mt-1 text-xs text-slate-600">
@@ -260,7 +316,7 @@ export default function DashboardPage() {
 
                   <div className="mt-1 flex items-center gap-2 text-xs">
                     <span className="text-red-600">
-                      {new Date(s.from).toLocaleDateString("ru-RU", {
+                      {new Date(item.from).toLocaleDateString("ru-RU", {
                         day: "numeric",
                         month: "short",
                       })}
@@ -269,41 +325,66 @@ export default function DashboardPage() {
                     <span className="text-slate-400">→</span>
 
                     <span className="text-emerald-600">
-                      {new Date(s.to).toLocaleDateString("ru-RU", {
+                      {new Date(item.to).toLocaleDateString("ru-RU", {
                         day: "numeric",
                         month: "short",
                       })}
                     </span>
                   </div>
-                  {s.reason && (
+                  {item.reason && (
                     <div className="mt-2 text-xs text-slate-500">
-                      Причина: {reasonRu(s.reason)}
+                      Причина: {reasonRu(item.reason)}
                     </div>
+                  )}
+
+                  {isGroupTask && !rolesLoading && !canReschedule && (
+                    <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-2 text-xs text-amber-900">
+                      Перенести по рекомендации может только{" "}
+                      <strong>владелец</strong> группы
+                      {groupName ? ` «${groupName}»` : ""}. Остальные участники
+                      могут посмотреть подсказку, но дату меняет владелец.
+                    </p>
                   )}
 
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     <Button
                       type="button"
                       variant="secondary"
+                      title={
+                        isGroupTask && !canReschedule
+                          ? "Только владелец группы может перенести командное задание"
+                          : undefined
+                      }
                       onClick={() =>
                         rescheduleMutation.mutate({
-                          taskId: s.taskId,
-                          to: normalizeDateOnly(s.to),
+                          taskId: item.taskId,
+                          to: normalizeDateOnly(item.to),
                         })
                       }
                       disabled={
-                        rescheduleMutation.isPending &&
-                        rescheduleMutation.variables?.taskId === s.taskId
+                        rolesLoading ||
+                        (isGroupTask && !canReschedule) ||
+                        (rescheduleMutation.isPending &&
+                          rescheduleMutation.variables?.taskId === item.taskId)
                       }
                     >
                       {rescheduleMutation.isPending &&
-                      rescheduleMutation.variables?.taskId === s.taskId
+                      rescheduleMutation.variables?.taskId === item.taskId
                         ? "Переносим..."
                         : "Подтвердить перенос"}
                     </Button>
+                    {groupId && canReschedule && (
+                      <Link
+                        href={`/groups/${groupId}`}
+                        className="text-xs font-medium text-sky-700 hover:underline"
+                      >
+                        Страница команды
+                      </Link>
+                    )}
                   </div>
                 </div>
-              ))}
+              );
+              })}
             </div>
           )}
         </div>
@@ -379,4 +460,28 @@ function normalizeDateOnly(isoOrDate: string) {
   const d = new Date(isoOrDate);
   if (Number.isNaN(d.getTime())) return isoOrDate;
   return d.toISOString().slice(0, 10);
+}
+
+function rescheduleErrorMessage(err: unknown): string {
+  if (!(err instanceof ApiError)) return "Ошибка переноса";
+  const msg = err.message.toLowerCase();
+  if (msg.includes("only group owner")) {
+    return "Перенести командное задание может только владелец группы";
+  }
+  if (msg.includes("not a member")) {
+    return "Вы не состоите в этой группе";
+  }
+  if (msg.includes("urgent")) {
+    return "Срочные задания нельзя переносить";
+  }
+  if (msg.includes("completed")) {
+    return "Выполненное задание нельзя переносить";
+  }
+  if (msg.includes("past date")) {
+    return "Нельзя перенести на прошедшую дату";
+  }
+  if (msg.includes("overloaded")) {
+    return "На выбранный день уже слишком высокая нагрузка";
+  }
+  return err.message;
 }

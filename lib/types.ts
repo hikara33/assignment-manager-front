@@ -102,4 +102,5 @@ export type SuggestReschedule = {
   from: string;
   to: string;
   reason?: string;
+  groupId?: string | null;
 };
