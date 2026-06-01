@@ -76,18 +76,48 @@ apiClient.interceptors.response.use(
   },
 );
 
+/** Unified API error body from HttpExceptionFilter */
+export interface ErrorResponse {
+  success: false;
+  statusCode: number;
+  message: string;
+  errors?: string[];
+  path: string;
+  timestamp: string;
+}
+
+function parseErrorResponse(body: unknown): ErrorResponse | null {
+  if (!body || typeof body !== "object") return null;
+  const o = body as Record<string, unknown>;
+  if (o.success !== false || typeof o.message !== "string") return null;
+  return body as ErrorResponse;
+}
+
 export class ApiError extends Error {
+  /** Validation messages when status is 4xx with `errors` in the response body */
+  readonly errors?: string[];
+
   constructor(
     public status: number,
     public body: unknown,
     message?: string,
   ) {
-    super(message ?? `HTTP ${status}`);
+    const parsed = parseErrorResponse(body);
+    super(message ?? formatMessage(body));
     this.name = "ApiError";
+    this.errors = parsed?.errors;
   }
 }
 
 function formatMessage(body: unknown): string {
+  const parsed = parseErrorResponse(body);
+  if (parsed) {
+    if (parsed.errors?.length) {
+      return parsed.errors.join(", ");
+    }
+    return parsed.message;
+  }
+
   if (!body || typeof body !== "object") return "Ошибка запроса";
   const m = (body as { message?: unknown }).message;
   if (typeof m === "string") return m;
