@@ -109,6 +109,14 @@ export class ApiError extends Error {
   }
 }
 
+export function isApiError(err: unknown): err is ApiError {
+  return err instanceof ApiError;
+}
+
+export function isTooManyRequests(err: unknown): boolean {
+  return isApiError(err) && err.status === 429;
+}
+
 function formatMessage(body: unknown): string {
   const parsed = parseErrorResponse(body);
   if (parsed) {
