@@ -2,6 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { AuthQuerySync } from "@/components/auth-query-sync";
 import { useAuthStore } from "@/lib/auth-store";
 import { apiJson, refreshAccessToken } from "@/lib/api";
 import type { User } from "@/lib/types";
@@ -50,6 +51,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <AuthQuerySync />
       <SessionBootstrap />
       {children}
     </QueryClientProvider>

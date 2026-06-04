@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import Link from "next/link";
 import { apiClient, apiJson } from "@/lib/api";
+import { useAuthStore } from "@/lib/auth-store";
 import type { Assignment, AssignmentStatus, Paginated } from "@/lib/types";
 import { ASSIGNMENTS_PAGE_SIZE, totalPages } from "@/lib/pagination";
 import { Card } from "@/components/ui/card";
@@ -22,12 +23,13 @@ const statuses: { value: AssignmentStatus | ""; label: string }[] = [
 ];
 
 export default function AssignmentsPage() {
+  const userId = useAuthStore((s) => s.user?.id);
   const [status, setStatus] = useState<AssignmentStatus | "">("");
   const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
 
   const list = useQuery({
-    ...useAssignmentsQuery(status, page),
+    ...useAssignmentsQuery(userId, status, page),
     placeholderData: keepPreviousData,
   });
 
@@ -38,9 +40,9 @@ export default function AssignmentsPage() {
     if (!meta?.hasNextPage) return;
 
     void queryClient.prefetchQuery(
-      useAssignmentsQuery(status, page + 1),
+      useAssignmentsQuery(userId, status, page + 1),
     );
-  }, [meta, page, status, queryClient]);
+  }, [meta, page, status, userId, queryClient]);
 
   const toggleDone = useMutation({
     mutationFn: async (a: Assignment) => {

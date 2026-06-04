@@ -24,34 +24,38 @@ export default function DashboardPage() {
   const me = useAuthStore((s) => s.user);
 
   const stats = useQuery({
-    queryKey: ["dashboard"],
+    queryKey: ["dashboard", me?.id],
     queryFn: () => apiJson<DashboardStats>("/assignment/dashboard"),
+    enabled: !!me?.id,
   });
 
   const prioritized = useQuery({
-    queryKey: ["prioritized"],
+    queryKey: ["prioritized", me?.id],
     queryFn: () => apiJson<PrioritizedAssignment[]>("/assignment/prioritized"),
+    enabled: !!me?.id,
   });
 
   const conflicts = useQuery({
-    queryKey: ["conflicts"],
+    queryKey: ["conflicts", me?.id],
     queryFn: () => apiJson<Conflict[]>("/assignment/conflicts"),
+    enabled: !!me?.id,
   });
 
   const suggestions = useQuery({
-    queryKey: ["reschedule"],
+    queryKey: ["reschedule", me?.id],
     queryFn: () => apiJson<SuggestReschedule[]>("/assignment/reschedule-suggestions"),
+    enabled: !!me?.id,
   });
 
   const assignmentLookup = useQuery({
-    queryKey: ["assignments", "lookup"],
+    queryKey: ["assignments", "lookup", me?.id],
     queryFn: async () => {
       const res = await apiJson<Paginated<Assignment>>(
         "/assignment?limit=200&page=1",
       );
       return new Map(res.data.map((a) => [a.id, a]));
     },
-    enabled: (suggestions.data?.length ?? 0) > 0,
+    enabled: !!me?.id && (suggestions.data?.length ?? 0) > 0,
   });
 
   const groupIdsInSuggestions = useMemo(() => {

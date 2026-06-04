@@ -6,11 +6,13 @@ import { apiJson } from "../api";
 export const ASSIGNMENTS_QUERY_KEY = "assignments";
 
 export function useAssignmentsQuery(
+  userId: string | undefined,
   status: AssignmentStatus | "",
   page: number,
 ) {
   return queryOptions({
-    queryKey: [ASSIGNMENTS_QUERY_KEY, status, page],
+    queryKey: [ASSIGNMENTS_QUERY_KEY, userId, status, page],
+    enabled: !!userId,
 
     queryFn: async (): Promise<Paginated<Assignment>> => {
       const q = new URLSearchParams({

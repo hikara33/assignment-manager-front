@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
-import { useAuthStore } from "@/lib/auth-store";
 import { logoutRequest } from "@/lib/api";
+import { clearAuthSession } from "@/lib/auth-session";
+import { useAuthStore } from "@/lib/auth-store";
 import { cn } from "@/lib/utils";
 
 const nav = [
@@ -17,13 +19,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const clear = useAuthStore((s) => s.clear);
+  const queryClient = useQueryClient();
 
   async function logout() {
     try {
       await logoutRequest();
     } finally {
-      clear();
+      clearAuthSession(queryClient);
       router.replace("/login");
     }
   }

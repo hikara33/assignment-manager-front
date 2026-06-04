@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   acceptInviteRequest,
   ApiError,
@@ -11,6 +11,7 @@ import {
   getInvitePreview,
   logoutRequest,
 } from "@/lib/api";
+import { clearAuthSession } from "@/lib/auth-session";
 import { useAuthStore } from "@/lib/auth-store";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,7 +28,7 @@ function InviteInner() {
 
   const accessToken = useAuthStore((s) => s.accessToken);
   const user = useAuthStore((s) => s.user);
-  const clear = useAuthStore((s) => s.clear);
+  const queryClient = useQueryClient();
   const ready = useAuthStore((s) => s.ready);
 
   const [busy, setBusy] = useState(false);
@@ -88,7 +89,7 @@ function InviteInner() {
     } catch {
       // сессия могла быть уже недействительна
     } finally {
-      clear();
+      clearAuthSession(queryClient);
       const q = `invite=${encodeURIComponent(token)}`;
       if (preview.data?.userRegistered) {
         router.replace(`/login?${q}`);
