@@ -1,21 +1,384 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f0f7fc;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --border: #dbeafe;
+  --background: #d8ddd6;
+  --background-deep: #cdd2cb;
+  --foreground: #1c1f1c;
+  --foreground-muted: #5a5f58;
+  --foreground-faint: #8a9088;
+  --card-tone: #e8ebe6;
+  --card: rgba(232, 235, 230, 0.72);
+  --card-solid: #e8ebe6;
+  --card-hover: #eef0eb;
+  --border: rgba(30, 35, 28, 0.08);
+  --border-strong: rgba(30, 35, 28, 0.13);
+  --accent: #2e3330;
+  --accent-soft: rgba(46, 51, 48, 0.08);
+  --glow: rgba(168, 198, 172, 0.5);
+  --glow-strong: rgba(148, 188, 158, 0.65);
+  --selection-bg: rgba(210, 216, 208, 0.9);
+  --selection-border: rgba(30, 35, 28, 0.06);
+  --danger: #b8382e;
+  --danger-bg: rgba(184, 56, 46, 0.1);
+  --warning: #9a7a1a;
+  --warning-bg: rgba(154, 122, 26, 0.1);
+  --success: #2d5c48;
+  --success-bg: rgba(45, 92, 72, 0.1);
+  --info-bg: rgba(46, 51, 48, 0.05);
+  --panel: rgba(220, 226, 218, 0.45);
+  --panel-strong: rgba(210, 218, 208, 0.6);
+  --input-bg: #e2e6e1;
+  --nav-inactive: rgba(30, 35, 28, 0.32);
+  --nav-active: #1c1f1c;
+  --shadow-soft: 0 2px 16px rgba(30, 35, 28, 0.06);
+  --shadow-panel: 0 4px 32px rgba(30, 35, 28, 0.07);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-exo2);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-exo2), "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── XMB wave background ── */
+.xmb-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: linear-gradient(
+    165deg,
+    #e2e6e1 0%,
+    #d8ddd6 40%,
+    #d0d6ce 100%
+  );
+}
+
+.xmb-bg::before {
+  content: "";
+  position: absolute;
+  inset: -20% -10%;
+  background: radial-gradient(
+    ellipse 60% 50% at 30% 60%,
+    var(--glow) 0%,
+    transparent 70%
+  );
+  animation: xmb-glow 8s ease-in-out infinite alternate;
+}
+
+.xmb-waves {
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+}
+
+@keyframes xmb-glow {
+  0% {
+    opacity: 0.6;
+    transform: translate(0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(2%, -1%);
+  }
+}
+
+@keyframes xmb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes xmb-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ── Typography ── */
+.xmb-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--foreground);
+}
+
+.xmb-subtitle {
+  font-size: 0.875rem;
+  color: var(--foreground-muted);
+}
+
+.xmb-section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+}
+
+.xmb-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--foreground-muted);
+  letter-spacing: 0.01em;
+}
+
+.xmb-link {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  text-decoration: none;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.xmb-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── Chips / filters ── */
+.xmb-chip {
+  border-radius: 9999px;
+  padding: 0.375rem 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--foreground-muted);
+  background: var(--card);
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.xmb-chip:hover {
+  background: var(--card-hover);
+  color: var(--foreground);
+}
+
+.xmb-chip-active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.xmb-chip-active:hover {
+  background: #333;
+  color: #fff;
+}
+
+/* ── Badges ── */
+.xmb-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.125rem 0.625rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.xmb-badge-default {
+  background: var(--info-bg);
+  color: var(--foreground-muted);
+}
+
+.xmb-badge-success {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.xmb-badge-warning {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+
+.xmb-badge-danger {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.xmb-badge-team {
+  background: rgba(80, 60, 120, 0.1);
+  color: #504078;
+}
+
+/* ── Alerts ── */
+.xmb-alert {
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  font-size: 0.8125rem;
+  border: 1px solid var(--border);
+}
+
+.xmb-alert-info {
+  background: var(--info-bg);
+  color: var(--foreground);
+}
+
+.xmb-alert-warning {
+  background: var(--warning-bg);
+  border-color: rgba(184, 134, 11, 0.25);
+  color: #6b4f0a;
+}
+
+.xmb-alert-danger {
+  background: var(--danger-bg);
+  border-color: rgba(192, 57, 43, 0.2);
+  color: var(--danger);
+}
+
+.xmb-alert-success {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+/* ── List rows ── */
+.xmb-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  background: var(--card);
+}
+
+.xmb-row:hover {
+  background: var(--card-hover);
+  border-color: var(--border-strong);
+}
+
+.xmb-row-danger {
+  background: var(--danger-bg);
+  border-color: rgba(192, 57, 43, 0.15);
+}
+
+.xmb-row-danger:hover {
+  background: rgba(192, 57, 43, 0.14);
+}
+
+.xmb-row-warning {
+  background: var(--warning-bg);
+  border-color: rgba(184, 134, 11, 0.15);
+}
+
+.xmb-row-warning:hover {
+  background: rgba(184, 134, 11, 0.16);
+}
+
+.xmb-row-info {
+  background: var(--info-bg);
+  border-color: var(--border);
+}
+
+/* ── Loader ── */
+.xmb-loader {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--accent);
+  animation: xmb-spin 0.8s linear infinite;
+}
+
+.xmb-loader-sm {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-width: 1.5px;
+}
+
+/* ── Footer hints ── */
+.xmb-hints {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  font-size: 0.6875rem;
+  color: var(--foreground-faint);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.xmb-hints kbd {
+  display: inline-block;
+  padding: 0.125rem 0.375rem;
+  margin-right: 0.25rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-strong);
+  background: var(--card-solid);
+  font-family: inherit;
+  font-size: 0.625rem;
+  color: var(--foreground-muted);
+}
+
+/* ── Hide native browser icons on inputs ── */
+.xmb-input-clean {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.xmb-input-clean::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
+.xmb-input-clean::-webkit-inner-spin-button,
+.xmb-input-clean::-webkit-clear-button {
+  display: none;
+}
+
+.xmb-select-clean {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: none;
+  padding-right: 0.75rem;
+}
+
+/* ── Table ── */
+.xmb-table th {
+  padding-bottom: 0.5rem;
+  padding-right: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--foreground-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border);
+}
+
+.xmb-table td {
+  padding: 0.625rem 1rem 0.625rem 0;
+  font-size: 0.875rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.xmb-table tbody tr:last-child td {
+  border-bottom: none;
 }

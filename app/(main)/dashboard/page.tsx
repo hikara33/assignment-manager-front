@@ -106,8 +106,8 @@ export default function DashboardPage() {
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Dashboard</h1>
-          <p className="text-slate-600">Обзор заданий и подсказки</p>
+          <h1 className="xmb-title">Обзор</h1>
+          <p className="xmb-subtitle">Задания и подсказки</p>
         </div>
         <div className="flex gap-2">
           <Link href="/assignments/new">
@@ -117,61 +117,32 @@ export default function DashboardPage() {
       </div>
 
       {stats.isError && (
-        <p className="text-sm text-red-600">Не удалось загрузить статистику</p>
+        <p className="text-sm text-[var(--danger)]">Не удалось загрузить статистику</p>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard label="Всего" value={s?.total} loading={stats.isLoading} />
-        <StatCard
-          label="В работе"
-          value={s?.pending}
-          loading={stats.isLoading}
-          accent="sky"
-        />
-        <StatCard
-          label="Выполнено"
-          value={s?.completed}
-          loading={stats.isLoading}
-          accent="emerald"
-        />
-        <StatCard
-          label="Просрочено"
-          value={s?.overdue}
-          loading={stats.isLoading}
-          accent="amber"
-        />
-        <StatCard
-          label="Срочные"
-          value={s?.urgent}
-          loading={stats.isLoading}
-          accent="rose"
-        />
+        <StatCard label="В работе" value={s?.pending} loading={stats.isLoading} accent />
+        <StatCard label="Выполнено" value={s?.completed} loading={stats.isLoading} />
+        <StatCard label="Просрочено" value={s?.overdue} loading={stats.isLoading} warn />
+        <StatCard label="Срочные" value={s?.urgent} loading={stats.isLoading} danger />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
-          <h2 className="text-lg font-semibold text-slate-900">
-            Приоритетные задания
-          </h2>
-          <p className="text-sm text-slate-500">
-            Красным — самые срочные, жёлтым —
-            просроченные.
+          <h2 className="xmb-section-title">Приоритетные задания</h2>
+          <p className="mt-1 text-xs text-[var(--foreground-muted)]">
+            Красным — самые срочные, жёлтым — просроченные.
           </p>
           <ul className="mt-4 max-h-72 space-y-2 overflow-y-auto pr-1 [scrollbar-gutter:stable]">
             {prioritized.isLoading && (
-              <li className="text-sm text-slate-500">Загрузка…</li>
+              <li className="text-sm text-[var(--foreground-muted)]">Загрузка…</li>
             )}
             {prioritized.data?.map((a) => {
               const row = prioritizedTaskRowClasses(a, topPrioritizedScore);
               return (
                 <li key={a.id}>
-                  <Link
-                    href={`/assignments/${a.id}`}
-                    className={cn(
-                      "flex items-center justify-between rounded-lg border px-3 py-2 text-sm transition-colors",
-                      row.link,
-                    )}
-                  >
+                  <Link href={`/assignments/${a.id}`} className={row.link}>
                     <span className={cn("font-medium", row.title)}>{a.title}</span>
                     <span className={cn("text-xs tabular-nums", row.due)}>
                       {formatDue(a.dueDay)}
@@ -181,30 +152,24 @@ export default function DashboardPage() {
               );
             })}
             {prioritized.data?.length === 0 && (
-              <li className="text-sm text-slate-500">Пока нет заданий</li>
+              <li className="text-sm text-[var(--foreground-muted)]">Пока нет заданий</li>
             )}
           </ul>
-          <Link
-            href="/assignments"
-            className="mt-4 inline-block text-sm font-medium text-sky-700 hover:underline"
-          >
-            Все задания →
+          <Link href="/assignments" className="mt-4 inline-block">
+            <Button type="button" variant="secondary">
+              Все задания
+            </Button>
           </Link>
         </Card>
 
         <Card>
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-lg font-semibold text-slate-900">
-              Конфликты дедлайнов
-            </h2>
-
+            <h2 className="xmb-section-title">Конфликты дедлайнов</h2>
             {!conflicts.isLoading && conflicts.data?.length ? (
-              <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
-                {conflicts.data.length}
-              </span>
+              <span className="xmb-badge xmb-badge-danger">{conflicts.data.length}</span>
             ) : null}
           </div>
-          <p className="mt-2 border-l-2 border-slate-200 pl-3 text-xs leading-relaxed text-slate-500">
+          <p className="mt-2 border-l-2 border-[var(--border-strong)] pl-3 text-xs leading-relaxed text-[var(--foreground-muted)]">
             Здесь видны дни, когда на вас сразу сходится много дедлайнов. Это
             сигнал разнести работу по времени или перенести часть задач, чтобы не
             всё горело одной датой.
@@ -212,33 +177,29 @@ export default function DashboardPage() {
 
           <div className="mt-3 max-h-64 overflow-y-auto pr-1 [scrollbar-gutter:stable]">
             {conflicts.isLoading ? (
-              <div className="text-sm text-slate-500">Загрузка...</div>
+              <div className="text-sm text-[var(--foreground-muted)]">Загрузка...</div>
             ) : !conflicts.data || conflicts.data.length === 0 ? (
-              <div className="flex items-center gap-2 text-sm text-slate-500">
-                <span>✅</span>
-                <span>Конфликтов нет</span>
+              <div className="text-sm text-[var(--foreground-muted)]">
+                Конфликтов нет
               </div>
             ) : (
               <div className="space-y-3">
                 {conflicts.data.map((conflict) => (
                   <div
                     key={conflict.date}
-                    className="rounded-xl border border-red-200 bg-red-50 p-3"
+                    className="rounded-[var(--radius-md)] border border-[rgba(192,57,43,0.2)] bg-[var(--danger-bg)] p-3"
                   >
                     <div className="flex items-center justify-between">
-                      <div className="font-medium text-red-900">
+                      <div className="font-medium text-[var(--danger)]">
                         {conflict.tasks.map((t) => t.title).join(", ")}
                       </div>
-                      <span className="text-xs text-red-600">⚠️</span>
                     </div>
-
-                    <div className="mt-1 text-xs text-red-700">
+                    <div className="mt-1 text-xs text-[var(--danger)] opacity-80">
                       Количество задач: {conflict.count}
                     </div>
-
                     {conflict.date && (
-                      <div className="mt-2 text-xs text-red-600">
-                        📅 {new Date(conflict.date).toLocaleString("ru-RU", {
+                      <div className="mt-2 text-xs text-[var(--danger)] opacity-70">
+                        {new Date(conflict.date).toLocaleString("ru-RU", {
                           day: "numeric",
                           month: "short",
                           year: "numeric",
@@ -254,10 +215,8 @@ export default function DashboardPage() {
       </div>
 
       <Card>
-        <h2 className="text-lg font-semibold text-slate-900">
-          Рекомендации по переносу
-        </h2>
-        <p className="mt-2 border-l-2 border-slate-200 pl-3 text-xs leading-relaxed text-slate-500">
+        <h2 className="xmb-section-title">Рекомендации по переносу</h2>
+        <p className="mt-2 border-l-2 border-[var(--border-strong)] pl-3 text-xs leading-relaxed text-[var(--foreground-muted)]">
           Подсказки, как сдвинуть сроки, если дедлайны пересекаются или день
           перегружен. Личные задания можно перенести сразу по кнопке; для заданий
           команды — только владелец группы.
@@ -265,16 +224,13 @@ export default function DashboardPage() {
 
         <div className="mt-3 max-h-64 overflow-y-auto pr-1 [scrollbar-gutter:stable]">
           {rescheduleError && (
-            <div className="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
-              {rescheduleError}
-            </div>
+            <div className="xmb-alert xmb-alert-danger mb-3">{rescheduleError}</div>
           )}
           {suggestions.isLoading ? (
-            <div className="text-sm text-slate-500">Загрузка...</div>
+            <div className="text-sm text-[var(--foreground-muted)]">Загрузка...</div>
           ) : !suggestions.data || suggestions.data.length === 0 ? (
-            <div className="flex items-center gap-2 text-sm text-slate-500">
-              <span>✅</span>
-              <span>Перенос не требуется</span>
+            <div className="text-sm text-[var(--foreground-muted)]">
+              Перенос не требуется
             </div>
           ) : (
             <div className="space-y-3">
@@ -292,102 +248,99 @@ export default function DashboardPage() {
                   (assignmentLookup.isLoading || myGroupRoles.isLoading);
 
                 return (
-                <div
-                  key={item.taskId}
-                  className="rounded-xl border border-sky-200 bg-sky-50 p-3"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="font-medium text-slate-900">
-                      {item.taskTitle}
+                  <div
+                    key={item.taskId}
+                    className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--info-bg)] p-3"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="font-medium text-[var(--foreground)]">
+                        {item.taskTitle}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {isGroupTask && (
+                          <span className="xmb-badge xmb-badge-team">
+                            Команда{groupName ? `: ${groupName}` : ""}
+                          </span>
+                        )}
+                        {item.priority && (
+                          <span className="xmb-badge xmb-badge-default">
+                            {priorityRu(item.priority)}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      {isGroupTask && (
-                        <span className="rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-800">
-                          Команда{groupName ? `: ${groupName}` : ""}
-                        </span>
-                      )}
-                      {item.priority && (
-                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
-                          {priorityRu(item.priority)}
-                        </span>
-                      )}
+
+                    <div className="mt-1 text-xs text-[var(--foreground-muted)]">
+                      Перенести:
                     </div>
-                  </div>
 
-                  <div className="mt-1 text-xs text-slate-600">
-                    Перенести:
-                  </div>
-
-                  <div className="mt-1 flex items-center gap-2 text-xs">
-                    <span className="text-red-600">
-                      {new Date(item.from).toLocaleDateString("ru-RU", {
-                        day: "numeric",
-                        month: "short",
-                      })}
-                    </span>
-
-                    <span className="text-slate-400">→</span>
-
-                    <span className="text-emerald-600">
-                      {new Date(item.to).toLocaleDateString("ru-RU", {
-                        day: "numeric",
-                        month: "short",
-                      })}
-                    </span>
-                  </div>
-                  {item.reason && (
-                    <div className="mt-2 text-xs text-slate-500">
-                      Причина: {reasonRu(item.reason)}
+                    <div className="mt-1 flex items-center gap-2 text-xs">
+                      <span className="text-[var(--danger)]">
+                        {new Date(item.from).toLocaleDateString("ru-RU", {
+                          day: "numeric",
+                          month: "short",
+                        })}
+                      </span>
+                      <span className="text-[var(--foreground-faint)]">на</span>
+                      <span className="text-[var(--success)]">
+                        {new Date(item.to).toLocaleDateString("ru-RU", {
+                          day: "numeric",
+                          month: "short",
+                        })}
+                      </span>
                     </div>
-                  )}
-
-                  {isGroupTask && !rolesLoading && !canReschedule && (
-                    <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-2 text-xs text-amber-900">
-                      Перенести по рекомендации может только{" "}
-                      <strong>владелец</strong> группы
-                      {groupName ? ` «${groupName}»` : ""}. Остальные участники
-                      могут посмотреть подсказку, но дату меняет владелец.
-                    </p>
-                  )}
-
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      title={
-                        isGroupTask && !canReschedule
-                          ? "Только владелец группы может перенести командное задание"
-                          : undefined
-                      }
-                      onClick={() =>
-                        rescheduleMutation.mutate({
-                          taskId: item.taskId,
-                          to: normalizeDateOnly(item.to),
-                        })
-                      }
-                      disabled={
-                        rolesLoading ||
-                        (isGroupTask && !canReschedule) ||
-                        (rescheduleMutation.isPending &&
-                          rescheduleMutation.variables?.taskId === item.taskId)
-                      }
-                    >
-                      {rescheduleMutation.isPending &&
-                      rescheduleMutation.variables?.taskId === item.taskId
-                        ? "Переносим..."
-                        : "Подтвердить перенос"}
-                    </Button>
-                    {groupId && canReschedule && (
-                      <Link
-                        href={`/groups/${groupId}`}
-                        className="text-xs font-medium text-sky-700 hover:underline"
-                      >
-                        Страница команды
-                      </Link>
+                    {item.reason && (
+                      <div className="mt-2 text-xs text-[var(--foreground-muted)]">
+                        Причина: {reasonRu(item.reason)}
+                      </div>
                     )}
+
+                    {isGroupTask && !rolesLoading && !canReschedule && (
+                      <p className="xmb-alert xmb-alert-warning mt-3">
+                        Перенести по рекомендации может только{" "}
+                        <strong>владелец</strong> группы
+                        {groupName ? ` «${groupName}»` : ""}. Остальные участники
+                        могут посмотреть подсказку, но дату меняет владелец.
+                      </p>
+                    )}
+
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        title={
+                          isGroupTask && !canReschedule
+                            ? "Только владелец группы может перенести командное задание"
+                            : undefined
+                        }
+                        onClick={() =>
+                          rescheduleMutation.mutate({
+                            taskId: item.taskId,
+                            to: normalizeDateOnly(item.to),
+                          })
+                        }
+                        disabled={
+                          rolesLoading ||
+                          (isGroupTask && !canReschedule) ||
+                          (rescheduleMutation.isPending &&
+                            rescheduleMutation.variables?.taskId === item.taskId)
+                        }
+                      >
+                        {rescheduleMutation.isPending &&
+                        rescheduleMutation.variables?.taskId === item.taskId
+                          ? "Переносим..."
+                          : "Подтвердить перенос"}
+                      </Button>
+                      {groupId && canReschedule && (
+                        <Link href={`/groups/${groupId}`}>
+                          <Button type="button" variant="ghost" className="text-xs">
+                            Страница команды
+                          </Button>
+                        </Link>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
+                );
               })}
             </div>
           )}
@@ -402,25 +355,39 @@ function StatCard({
   value,
   loading,
   accent,
+  warn,
+  danger,
 }: {
   label: string;
   value?: number;
   loading?: boolean;
-  accent?: "sky" | "emerald" | "amber" | "rose";
+  accent?: boolean;
+  warn?: boolean;
+  danger?: boolean;
 }) {
-  const border =
-    accent === "emerald"
-      ? "border-emerald-100"
-      : accent === "amber"
-        ? "border-amber-100"
-        : accent === "rose"
-          ? "border-rose-100"
-          : "border-sky-100";
-
   return (
-    <Card className={border}>
-      <p className="text-sm font-medium text-slate-500">{label}</p>
-      <p className="mt-1 text-3xl font-semibold tabular-nums text-slate-900">
+    <Card
+      className={cn(
+        "p-4",
+        danger && "border-[rgba(192,57,43,0.15)]",
+        warn && "border-[rgba(184,134,11,0.15)]",
+      )}
+    >
+      <p className="text-[0.6875rem] font-medium uppercase tracking-wider text-[var(--foreground-faint)]">
+        {label}
+      </p>
+      <p
+        className={cn(
+          "mt-1 text-3xl font-semibold tabular-nums",
+          danger
+            ? "text-[var(--danger)]"
+            : warn
+              ? "text-[var(--warning)]"
+              : accent
+                ? "text-[var(--foreground)]"
+                : "text-[var(--foreground)]",
+        )}
+      >
         {loading ? "—" : value ?? 0}
       </p>
     </Card>
@@ -458,9 +425,7 @@ function reasonRu(reason: string) {
 }
 
 function normalizeDateOnly(isoOrDate: string) {
-  // В бэкенд передаём формат YYYY-MM-DD.
   if (/^\d{4}-\d{2}-\d{2}$/.test(isoOrDate)) return isoOrDate;
-
   const d = new Date(isoOrDate);
   if (Number.isNaN(d.getTime())) return isoOrDate;
   return d.toISOString().slice(0, 10);

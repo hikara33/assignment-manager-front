@@ -9,7 +9,9 @@ import type { Assignment, AssignmentPriority, Group, Paginated, Subject } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
+import { BackButton } from "@/components/ui/back-button";
 import { ASSIGNMENTS_QUERY_KEY } from "@/lib/queries/assignments";
 
 function useMyGroups() {
@@ -79,15 +81,8 @@ export default function NewAssignmentPage() {
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <div>
-        <Link
-          href="/assignments"
-          className="text-sm font-medium text-sky-700 hover:underline"
-        >
-          ← К списку
-        </Link>
-        <h1 className="mt-2 text-2xl font-semibold text-slate-900">
-          Новое задание
-        </h1>
+        <BackButton href="/assignments">К списку</BackButton>
+        <h1 className="xmb-title mt-4">Новое задание</h1>
       </div>
 
       <Card>
@@ -100,9 +95,7 @@ export default function NewAssignmentPage() {
           }}
         >
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Название
-            </label>
+            <label className="xmb-label">Название</label>
             <Input
               required
               minLength={2}
@@ -111,15 +104,11 @@ export default function NewAssignmentPage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Описание
-            </label>
+            <label className="xmb-label">Описание</label>
             <Textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Дедлайн
-            </label>
+            <label className="xmb-label">Дедлайн</label>
             <Input
               type="datetime-local"
               required
@@ -128,12 +117,9 @@ export default function NewAssignmentPage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Направление
-            </label>
-            <select
+            <label className="xmb-label">Направление</label>
+            <Select
               required
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
               value={subjectId}
               onChange={(e) => setSubjectId(e.target.value)}
             >
@@ -143,35 +129,26 @@ export default function NewAssignmentPage() {
                   {s.name}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Группа (необязательно)
-            </label>
-            <select
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
-              value={groupId}
-              onChange={(e) => setGroupId(e.target.value)}
-            >
+            <label className="xmb-label">Группа (необязательно)</label>
+            <Select value={groupId} onChange={(e) => setGroupId(e.target.value)}>
               <option value="">Без группы</option>
               {groups.data?.map((g) => (
                 <option key={g.id} value={g.id}>
                   {g.name}
                 </option>
               ))}
-            </select>
-            <p className="mt-1 text-xs text-slate-500">
+            </Select>
+            <p className="mt-1 text-xs text-[var(--foreground-muted)]">
               Список строится из ваших заданий с группой. Пустую группу можно
-              создать в разделе «Группы».
+              создать в разделе «Команды».
             </p>
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Приоритет
-            </label>
-            <select
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
+            <label className="xmb-label">Приоритет</label>
+            <Select
               value={priority}
               onChange={(e) =>
                 setPriority(e.target.value as AssignmentPriority)
@@ -181,10 +158,10 @@ export default function NewAssignmentPage() {
               <option value="MEDIUM">Средний</option>
               <option value="HIGH">Высокий</option>
               <option value="URGENT">Срочно</option>
-            </select>
+            </Select>
           </div>
           {error && (
-            <p className="text-sm text-red-600" role="alert">
+            <p className="text-sm text-[var(--danger)]" role="alert">
               {error}
             </p>
           )}

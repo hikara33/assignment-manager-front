@@ -9,7 +9,9 @@ import type { Assignment, AssignmentPriority } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
+import { BackButton } from "@/components/ui/back-button";
 
 function dueToLocal(iso: string) {
   const d = new Date(iso);
@@ -89,12 +91,7 @@ function AssignmentEditor({
 
   return (
     <div className="mx-auto max-w-xl space-y-6">
-      <Link
-        href="/assignments"
-        className="text-sm font-medium text-sky-700 hover:underline"
-      >
-        ← К списку
-      </Link>
+      <BackButton href="/assignments">К списку</BackButton>
 
       <div className="flex flex-wrap gap-2">
         <Button
@@ -120,7 +117,7 @@ function AssignmentEditor({
       </div>
 
       <Card>
-        <h1 className="text-xl font-semibold text-slate-900">Редактирование</h1>
+        <h1 className="xmb-section-title">Редактирование</h1>
         <form
           className="mt-4 space-y-4"
           onSubmit={(e) => {
@@ -129,9 +126,7 @@ function AssignmentEditor({
           }}
         >
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Название
-            </label>
+            <label className="xmb-label">Название</label>
             <Input
               required
               minLength={2}
@@ -140,9 +135,7 @@ function AssignmentEditor({
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Описание
-            </label>
+            <label className="xmb-label">Описание</label>
             <Textarea
               rows={3}
               value={description}
@@ -150,9 +143,7 @@ function AssignmentEditor({
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Дедлайн
-            </label>
+            <label className="xmb-label">Дедлайн</label>
             <Input
               type="datetime-local"
               required
@@ -161,11 +152,8 @@ function AssignmentEditor({
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Приоритет
-            </label>
-            <select
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-200"
+            <label className="xmb-label">Приоритет</label>
+            <Select
               value={priority}
               onChange={(e) =>
                 setPriority(e.target.value as AssignmentPriority)
@@ -175,10 +163,10 @@ function AssignmentEditor({
               <option value="MEDIUM">Средний</option>
               <option value="HIGH">Высокий</option>
               <option value="URGENT">Срочно</option>
-            </select>
+            </Select>
           </div>
           {saveErr && (
-            <p className="text-sm text-red-600" role="alert">
+            <p className="text-sm text-[var(--danger)]" role="alert">
               {saveErr}
             </p>
           )}
@@ -188,13 +176,13 @@ function AssignmentEditor({
         </form>
       </Card>
 
-      <Card className="bg-slate-50/80">
-        <p className="text-sm text-slate-600">
-          Направление: <strong>{a.subjectId}</strong> (id; название в списке
+      <Card className="bg-[var(--info-bg)]">
+        <p className="text-sm text-[var(--foreground-muted)]">
+          Направление: <strong className="text-[var(--foreground)]">{a.subjectId}</strong> (id; название в списке
           заданий)
         </p>
-        <p className="text-sm text-slate-600">
-          Статус: <strong>{a.status}</strong>
+        <p className="text-sm text-[var(--foreground-muted)]">
+          Статус: <strong className="text-[var(--foreground)]">{a.status}</strong>
         </p>
       </Card>
     </div>
@@ -212,15 +200,15 @@ export default function AssignmentDetailPage() {
   });
 
   if (detail.isLoading) {
-    return <p className="text-slate-500">Загрузка…</p>;
+    return <p className="text-[var(--foreground-muted)]">Загрузка…</p>;
   }
   if (detail.isError || !detail.data) {
     return (
-      <p className="text-red-600">
+      <p className="text-[var(--danger)]">
         Задание не найдено или нет доступа.
-        <Link href="/assignments" className="ml-2 underline">
+        <BackButton href="/assignments" className="ml-2">
           Назад
-        </Link>
+        </BackButton>
       </p>
     );
   }

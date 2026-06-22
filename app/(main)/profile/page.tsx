@@ -39,40 +39,48 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-lg space-y-6">
-      <h1 className="text-2xl font-semibold text-slate-900">Профиль</h1>
+      <h1 className="xmb-title">Профиль</h1>
 
       <Card>
         {u ? (
-          <dl className="space-y-3 text-sm">
+          <dl className="space-y-4 text-sm">
             <div>
-              <dt className="text-slate-500">Имя</dt>
-              <dd className="font-medium text-slate-900">{u.name}</dd>
+              <dt className="text-[0.6875rem] font-medium uppercase tracking-wider text-[var(--foreground-faint)]">
+                Имя
+              </dt>
+              <dd className="mt-0.5 font-medium text-[var(--foreground)]">{u.name}</dd>
             </div>
             <div>
-              <dt className="text-slate-500">Email</dt>
-              <dd className="font-medium text-slate-900">{u.email}</dd>
+              <dt className="text-[0.6875rem] font-medium uppercase tracking-wider text-[var(--foreground-faint)]">
+                Email
+              </dt>
+              <dd className="mt-0.5 font-medium text-[var(--foreground)]">{u.email}</dd>
             </div>
             <div>
-              <dt className="text-slate-500">Роль</dt>
-              <dd className="font-medium text-slate-900">
+              <dt className="text-[0.6875rem] font-medium uppercase tracking-wider text-[var(--foreground-faint)]">
+                Роль
+              </dt>
+              <dd className="mt-0.5 font-medium text-[var(--foreground)]">
                 {u.role === "ADMIN" ? "Администратор" : "Пользователь"}
               </dd>
             </div>
             <div>
-              <dt className="text-slate-500">ID</dt>
-              <dd className="break-all font-mono text-xs text-slate-600">
+              <dt className="text-[0.6875rem] font-medium uppercase tracking-wider text-[var(--foreground-faint)]">
+                ID
+              </dt>
+              <dd className="mt-0.5 break-all font-mono text-xs text-[var(--foreground-muted)]">
                 {u.id}
               </dd>
             </div>
           </dl>
         ) : (
-          <p className="text-slate-500">Нет данных</p>
+          <p className="text-[var(--foreground-muted)]">Нет данных</p>
         )}
         <Button type="button" variant="secondary" className="mt-6" onClick={() => void refresh()}>
           Обновить из API
         </Button>
-        {msg && <p className="mt-3 text-sm text-emerald-700">{msg}</p>}
-        {err && <p className="mt-3 text-sm text-red-600">{err}</p>}
+        {msg && <p className="mt-3 text-sm text-[var(--success)]">{msg}</p>}
+        {err && <p className="mt-3 text-sm text-[var(--danger)]">{err}</p>}
       </Card>
     </div>
   );

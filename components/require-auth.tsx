@@ -3,6 +3,7 @@
 import { useAuthStore } from "@/lib/auth-store";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { XmbBackground } from "@/components/xmb-background";
 
 export function RequireAuth({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -17,10 +18,11 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
 
   if (!ready) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--background)]">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-9 w-9 animate-spin rounded-full border-2 border-sky-400 border-t-transparent" />
-          <p className="text-sm text-slate-500">Загрузка сессии…</p>
+      <div className="relative flex min-h-screen flex-col items-center justify-center">
+        <XmbBackground />
+        <div className="relative z-10 flex flex-col items-center gap-4">
+          <div className="xmb-loader" />
+          <p className="text-sm text-[var(--foreground-muted)]">Загрузка сессии…</p>
         </div>
       </div>
     );

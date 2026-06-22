@@ -3,6 +3,7 @@
 import { useAuthStore } from "@/lib/auth-store";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { XmbBackground } from "@/components/xmb-background";
 
 export default function Home() {
   const router = useRouter();
@@ -15,8 +16,9 @@ export default function Home() {
   }, [ready, accessToken, router]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--background)]">
-      <div className="h-9 w-9 animate-spin rounded-full border-2 border-sky-400 border-t-transparent" />
+    <div className="relative flex min-h-screen items-center justify-center">
+      <XmbBackground />
+      <div className="relative z-10 xmb-loader" />
     </div>
   );
 }

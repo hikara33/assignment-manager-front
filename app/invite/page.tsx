@@ -15,6 +15,9 @@ import { clearAuthSession } from "@/lib/auth-session";
 import { useAuthStore } from "@/lib/auth-store";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { BackButton } from "@/components/ui/back-button";
+import { InlineLinkButton } from "@/components/ui/inline-link-button";
+import { AuthLayout } from "@/components/auth-layout";
 
 function normEmail(s: string) {
   return s.trim().toLowerCase();
@@ -60,7 +63,7 @@ function InviteInner() {
     setMsg(null);
     try {
       await acceptInviteRequest(token);
-      setMsg("Вы в группе. К заданиям →");
+      setMsg("Вы в группе. Переход к заданиям");
       void router.push("/assignments");
     } catch (e) {
       setErr(e instanceof ApiError ? e.message : "Не удалось принять");
@@ -102,27 +105,22 @@ function InviteInner() {
 
   if (!token) {
     return (
-      <Card className="max-w-md">
-        <h1 className="text-lg font-semibold text-slate-900">
-          Нет токена приглашения
-        </h1>
-        <p className="mt-2 text-sm text-slate-600">
+      <Card>
+        <h1 className="xmb-section-title">Нет токена приглашения</h1>
+        <p className="mt-2 text-sm text-[var(--foreground-muted)]">
           Откройте ссылку из письма или попросите новое приглашение.
         </p>
-        <Link
-          href="/login"
-          className="mt-4 inline-block text-sm font-medium text-sky-700 hover:underline"
-        >
+        <BackButton href="/login" className="mt-4">
           На страницу входа
-        </Link>
+        </BackButton>
       </Card>
     );
   }
 
   if (preview.isPending) {
     return (
-      <Card className="max-w-md">
-        <p className="text-sm text-slate-600">Проверка приглашения…</p>
+      <Card>
+        <p className="text-sm text-[var(--foreground-muted)]">Проверка приглашения…</p>
       </Card>
     );
   }
@@ -133,25 +131,20 @@ function InviteInner() {
         ? preview.error.message
         : "Ссылка недействительна или истекла.";
     return (
-      <Card className="max-w-md">
-        <h1 className="text-lg font-semibold text-slate-900">
-          Не удалось открыть приглашение
-        </h1>
-        <p className="mt-2 text-sm text-red-600">{message}</p>
-        <Link
-          href="/login"
-          className="mt-4 inline-block text-sm font-medium text-sky-700 hover:underline"
-        >
+      <Card>
+        <h1 className="xmb-section-title">Не удалось открыть приглашение</h1>
+        <p className="mt-2 text-sm text-[var(--danger)]">{message}</p>
+        <BackButton href="/login" className="mt-4">
           На страницу входа
-        </Link>
+        </BackButton>
       </Card>
     );
   }
 
   if (!ready) {
     return (
-      <Card className="max-w-md">
-        <p className="text-sm text-slate-600">Проверка сессии…</p>
+      <Card>
+        <p className="text-sm text-[var(--foreground-muted)]">Проверка сессии…</p>
       </Card>
     );
   }
@@ -160,13 +153,13 @@ function InviteInner() {
 
   if (!accessToken) {
     return (
-      <Card className="max-w-md border-sky-100">
-        <p className="text-sm text-slate-700">
+      <Card>
+        <p className="text-sm text-[var(--foreground)]">
           {data.userRegistered
             ? "Переход на страницу входа…"
             : "Переход к регистрации…"}
         </p>
-        <p className="mt-2 text-xs text-slate-500">
+        <p className="mt-2 text-xs text-[var(--foreground-muted)]">
           Приглашение в группу «{data.groupName}» для {data.email}
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
@@ -187,8 +180,8 @@ function InviteInner() {
 
   if (!user) {
     return (
-      <Card className="max-w-md">
-        <p className="text-sm text-slate-600">Загрузка профиля…</p>
+      <Card>
+        <p className="text-sm text-[var(--foreground-muted)]">Загрузка профиля…</p>
       </Card>
     );
   }
@@ -199,15 +192,13 @@ function InviteInner() {
 
   if (emailMismatch) {
     return (
-      <Card className="max-w-lg border-amber-100 bg-amber-50/30">
-        <h1 className="text-xl font-semibold text-slate-900">
-          Другой аккаунт
-        </h1>
-        <p className="mt-2 text-sm text-slate-700">
+      <Card className="border-[rgba(184,134,11,0.2)]">
+        <h1 className="xmb-section-title">Другой аккаунт</h1>
+        <p className="mt-2 text-sm text-[var(--foreground)]">
           Вы вошли как <strong>{user.email}</strong>, а приглашение в группу
           «{data.groupName}» отправлено на <strong>{data.email}</strong>.
         </p>
-        <p className="mt-2 text-sm text-slate-600">
+        <p className="mt-2 text-sm text-[var(--foreground-muted)]">
           Выйдите и войдите (или зарегистрируйтесь) под email из приглашения —
           после этого сможете принять приглашение.
         </p>
@@ -225,15 +216,13 @@ function InviteInner() {
   }
 
   return (
-    <Card className="max-w-lg border-sky-100">
-      <h1 className="text-xl font-semibold text-slate-900">
-        Приглашение в группу
-      </h1>
-      <p className="mt-2 text-sm text-slate-600">
-        Группа: <strong>{data.groupName}</strong>
+    <Card>
+      <h1 className="xmb-section-title">Приглашение в группу</h1>
+      <p className="mt-2 text-sm text-[var(--foreground-muted)]">
+        Группа: <strong className="text-[var(--foreground)]">{data.groupName}</strong>
       </p>
-      <p className="mt-1 text-sm text-slate-600">
-        Адрес приглашения: <strong>{data.email}</strong>
+      <p className="mt-1 text-sm text-[var(--foreground-muted)]">
+        Адрес приглашения: <strong className="text-[var(--foreground)]">{data.email}</strong>
       </p>
 
       <div className="mt-6 flex flex-wrap gap-2">
@@ -250,18 +239,18 @@ function InviteInner() {
         </Button>
       </div>
 
-      {msg && <p className="mt-4 text-sm text-emerald-700">{msg}</p>}
-      {err && <p className="mt-4 text-sm text-red-600">{err}</p>}
+      {msg && <p className="mt-4 text-sm text-[var(--success)]">{msg}</p>}
+      {err && <p className="mt-4 text-sm text-[var(--danger)]">{err}</p>}
     </Card>
   );
 }
 
 export default function InvitePage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--background)] px-4">
-      <Suspense fallback={<p className="text-slate-500">Загрузка…</p>}>
+    <AuthLayout>
+      <Suspense fallback={<p className="text-[var(--foreground-muted)]">Загрузка…</p>}>
         <InviteInner />
       </Suspense>
-    </div>
+    </AuthLayout>
   );
 }

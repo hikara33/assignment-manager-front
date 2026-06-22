@@ -11,15 +11,17 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex items-center justify-center rounded-[var(--radius-md)] px-4 py-2 text-sm font-medium transition-all duration-200",
+        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]",
+        "disabled:pointer-events-none disabled:opacity-40",
         variant === "primary" &&
-          "bg-sky-600 text-white shadow-sm hover:bg-sky-700 focus-visible:outline-sky-600",
+          "bg-[var(--accent)] text-white shadow-[var(--shadow-soft)] hover:bg-[#333] active:scale-[0.98]",
         variant === "secondary" &&
-          "border border-slate-200 bg-white text-slate-800 shadow-sm hover:bg-slate-50 focus-visible:outline-slate-400",
+          "border border-[var(--border-strong)] bg-[var(--card-solid)] text-[var(--foreground)] hover:bg-[var(--card-hover)] active:scale-[0.98]",
         variant === "ghost" &&
-          "text-sky-800 hover:bg-sky-50 focus-visible:outline-sky-500",
+          "text-[var(--foreground-muted)] hover:bg-[var(--accent-soft)] hover:text-[var(--foreground)]",
         variant === "danger" &&
-          "bg-red-600 text-white hover:bg-red-700 focus-visible:outline-red-600",
+          "bg-[var(--danger)] text-white hover:bg-[#a93226] active:scale-[0.98]",
         className,
       )}
       {...props}

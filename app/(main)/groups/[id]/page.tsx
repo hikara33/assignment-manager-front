@@ -10,6 +10,7 @@ import type { Assignment, Group, GroupMemberRow, Paginated } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { BackButton } from "@/components/ui/back-button";
 
 export default function GroupDetailPage() {
   const params = useParams();
@@ -113,28 +114,23 @@ export default function GroupDetailPage() {
   return (
     <div className="space-y-8">
       <div>
-        <Link
-          href="/groups"
-          className="text-sm font-medium text-sky-700 hover:underline"
-        >
-          ← Все команды
-        </Link>
-        <h1 className="mt-2 text-2xl font-semibold text-slate-900">{groupName}</h1>
-        <p className="font-mono text-xs text-slate-400">{id}</p>
+        <BackButton href="/groups">Все команды</BackButton>
+        <h1 className="xmb-title mt-4">{groupName}</h1>
+        <p className="font-mono text-xs text-[var(--foreground-faint)]">{id}</p>
         {myRole && (
-          <p className="mt-1 text-sm text-slate-600">
+          <p className="mt-1 text-sm text-[var(--foreground-muted)]">
             Ваша роль:{" "}
-            <strong>{myRole === "OWNER" ? "Владелец" : "Участник"}</strong>
+            <strong className="text-[var(--foreground)]">
+              {myRole === "OWNER" ? "Владелец" : "Участник"}
+            </strong>
           </p>
         )}
       </div>
 
       {myRole === "OWNER" && (
         <Card>
-          <h2 className="text-lg font-semibold text-slate-900">
-            Пригласить по email
-          </h2>
-          <p className="text-sm text-slate-500">
+          <h2 className="xmb-section-title">Пригласить по email</h2>
+          <p className="text-sm text-[var(--foreground-muted)]">
             На почту уйдёт ссылка; для приёма нужен тот же email в аккаунте.
           </p>
           <form
@@ -158,21 +154,23 @@ export default function GroupDetailPage() {
             </Button>
           </form>
           {inviteErr && (
-            <p className="mt-2 text-sm text-red-600">{inviteErr}</p>
+            <p className="mt-2 text-sm text-[var(--danger)]">{inviteErr}</p>
           )}
           {invite.isSuccess && (
-            <p className="mt-2 text-sm text-emerald-700">Приглашение создано</p>
+            <p className="mt-2 text-sm text-[var(--success)]">Приглашение создано</p>
           )}
         </Card>
       )}
-      
-      <Card>
-        <h2 className="text-lg font-semibold text-slate-900">Задачи команды</h2>
 
-        {groupAssignments.isLoading && <p>Загрузка…</p>}
+      <Card>
+        <h2 className="xmb-section-title">Задачи команды</h2>
+
+        {groupAssignments.isLoading && (
+          <p className="text-[var(--foreground-muted)]">Загрузка…</p>
+        )}
 
         {groupAssignments.isError && (
-          <p className="text-red-600">Ошибка загрузки списка задач</p>
+          <p className="text-[var(--danger)]">Ошибка загрузки списка задач</p>
         )}
 
         {!groupAssignments.isLoading && !groupAssignments.isError && (
@@ -183,7 +181,7 @@ export default function GroupDetailPage() {
                   <li key={a.id}>
                     <Link
                       href={`/assignments/${a.id}`}
-                      className="text-sky-700 hover:underline"
+                      className="font-medium text-[var(--foreground)] hover:opacity-70"
                     >
                       {a.title} ({a.subject?.name ?? "Направление"})
                     </Link>
@@ -191,12 +189,10 @@ export default function GroupDetailPage() {
                 ))}
               </ul>
             ) : (
-              <div className="mt-4 text-center text-slate-500">
+              <div className="mt-4 text-center text-[var(--foreground-muted)]">
                 <p>У команды пока нет задач.</p>
                 <Link href="/assignments/new">
-                  <Button className="mt-2">
-                    Создать первую задачу
-                  </Button>
+                  <Button className="mt-2">Создать первую задачу</Button>
                 </Link>
               </div>
             )}
@@ -205,18 +201,23 @@ export default function GroupDetailPage() {
       </Card>
 
       <Card>
-        <h2 className="text-lg font-semibold text-slate-900">Участники</h2>
-        {members.isLoading && <p className="text-slate-500">Загрузка…</p>}
-        <ul className="mt-4 divide-y divide-slate-100">
+        <h2 className="xmb-section-title">Участники</h2>
+        {members.isLoading && (
+          <p className="text-[var(--foreground-muted)]">Загрузка…</p>
+        )}
+        {transferErr && (
+          <p className="xmb-alert xmb-alert-danger mt-2">{transferErr}</p>
+        )}
+        <ul className="mt-4 divide-y divide-[var(--border)]">
           {members.data?.map((m) => (
             <li
               key={m.userId}
               className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"
             >
               <div>
-                <p className="font-medium text-slate-900">{m.user.name}</p>
-                <p className="text-sm text-slate-500">{m.user.email}</p>
-                <p className="text-xs text-slate-400">
+                <p className="font-medium text-[var(--foreground)]">{m.user.name}</p>
+                <p className="text-sm text-[var(--foreground-muted)]">{m.user.email}</p>
+                <p className="text-xs text-[var(--foreground-faint)]">
                   {m.role === "OWNER" ? "Владелец" : "Участник"}
                 </p>
               </div>

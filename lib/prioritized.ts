@@ -24,23 +24,23 @@ export function prioritizedTaskRowClasses(
 
   if (isTop) {
     return {
-      link: "border-rose-200 bg-rose-50/90 hover:bg-rose-50",
-      title: "text-rose-950",
-      due: "text-rose-700",
+      link: "xmb-row xmb-row-danger",
+      title: "text-[var(--danger)]",
+      due: "text-[var(--danger)] opacity-80",
     };
   }
 
   if (task.isOverdue === true) {
     return {
-      link: "border-amber-200 bg-amber-50/90 hover:bg-amber-50",
-      title: "text-amber-950",
-      due: "text-amber-800",
+      link: "xmb-row xmb-row-warning",
+      title: "text-[var(--warning)]",
+      due: "text-[var(--warning)] opacity-80",
     };
   }
 
   return {
-    link: "border-slate-100 bg-slate-50/50 hover:bg-sky-50",
-    title: "text-slate-800",
-    due: "text-slate-500",
+    link: "xmb-row",
+    title: "text-[var(--foreground)]",
+    due: "text-[var(--foreground-muted)]",
   };
 }

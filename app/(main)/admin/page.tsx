@@ -1,7 +1,6 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ApiError, apiClient, apiJson } from "@/lib/api";
@@ -11,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { BackButton } from "@/components/ui/back-button";
 
 export default function AdminPage() {
   const role = useAuthStore((s) => s.user?.role);
@@ -26,7 +26,7 @@ export default function AdminPage() {
 
   if (!ready || !role) {
     return (
-      <p className="text-slate-500">
+      <p className="text-[var(--foreground-muted)]">
         {!ready ? "Загрузка…" : "Нет данных профиля"}
       </p>
     );
@@ -88,43 +88,39 @@ function AdminContent() {
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">
-          Администрирование
-        </h1>
-        <p className="text-slate-600">
-          Пользователи и направления.{" "}
-          <Link href="/dashboard" className="text-sky-700 hover:underline">
-            ← Dashboard
-          </Link>
+        <h1 className="xmb-title">Администрирование</h1>
+        <p className="xmb-subtitle">
+          Пользователи и направления.
         </p>
+        <BackButton href="/dashboard" className="mt-3">
+          Обзор
+        </BackButton>
       </div>
 
       <Card>
-        <h2 className="text-lg font-semibold text-slate-900">Пользователи</h2>
+        <h2 className="xmb-section-title">Пользователи</h2>
         {users.isError && (
-          <p className="mt-2 text-sm text-red-600">
+          <p className="mt-2 text-sm text-[var(--danger)]">
             {users.error instanceof ApiError
               ? users.error.message
               : "Нет доступа или ошибка загрузки"}
           </p>
         )}
         <div className="mt-4 overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="xmb-table w-full text-left">
             <thead>
-              <tr className="border-b border-slate-200 text-slate-500">
-                <th className="pb-2 pr-4 font-medium">Имя</th>
-                <th className="pb-2 pr-4 font-medium">Email</th>
-                <th className="pb-2 font-medium">Роль</th>
+              <tr>
+                <th>Имя</th>
+                <th>Email</th>
+                <th>Роль</th>
               </tr>
             </thead>
             <tbody>
               {users.data?.map((u) => (
-                <tr key={u.id} className="border-b border-slate-100">
-                  <td className="py-2 pr-4 font-medium text-slate-900">
-                    {u.name}
-                  </td>
-                  <td className="py-2 pr-4 text-slate-600">{u.email}</td>
-                  <td className="py-2 text-slate-600">{u.role}</td>
+                <tr key={u.id}>
+                  <td className="font-medium text-[var(--foreground)]">{u.name}</td>
+                  <td className="text-[var(--foreground-muted)]">{u.email}</td>
+                  <td className="text-[var(--foreground-muted)]">{u.role}</td>
                 </tr>
               ))}
             </tbody>
@@ -133,7 +129,7 @@ function AdminContent() {
       </Card>
 
       <Card>
-        <h2 className="text-lg font-semibold text-slate-900">Направления</h2>
+        <h2 className="xmb-section-title">Направления</h2>
         <form
           className="mt-4 grid gap-3 sm:grid-cols-2"
           onSubmit={(e) => {
@@ -142,9 +138,7 @@ function AdminContent() {
           }}
         >
           <div className="sm:col-span-2">
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Название
-            </label>
+            <label className="xmb-label">Название</label>
             <Input
               value={subName}
               onChange={(e) => setSubName(e.target.value)}
@@ -153,9 +147,7 @@ function AdminContent() {
             />
           </div>
           <div className="sm:col-span-2">
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Описание
-            </label>
+            <label className="xmb-label">Описание</label>
             <Textarea
               rows={2}
               value={subDesc}
@@ -163,25 +155,25 @@ function AdminContent() {
             />
           </div>
           {subErr && (
-            <p className="text-sm text-red-600 sm:col-span-2">{subErr}</p>
+            <p className="text-sm text-[var(--danger)] sm:col-span-2">{subErr}</p>
           )}
           <Button type="submit" disabled={createSubject.isPending}>
             Добавить направление
           </Button>
         </form>
 
-        <ul className="mt-6 divide-y divide-slate-100">
+        <ul className="mt-6 divide-y divide-[var(--border)]">
           {subjects.data?.map((s) => (
             <li
               key={s.id}
               className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"
             >
               <div>
-                <p className="font-medium text-slate-900">{s.name}</p>
+                <p className="font-medium text-[var(--foreground)]">{s.name}</p>
                 {s.description && (
-                  <p className="text-sm text-slate-500">{s.description}</p>
+                  <p className="text-sm text-[var(--foreground-muted)]">{s.description}</p>
                 )}
-                <p className="font-mono text-xs text-slate-400">{s.id}</p>
+                <p className="font-mono text-xs text-[var(--foreground-faint)]">{s.id}</p>
               </div>
               <Button
                 type="button"

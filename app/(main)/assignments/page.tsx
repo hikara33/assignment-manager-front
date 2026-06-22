@@ -2,12 +2,12 @@
 
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import Link from "next/link";
-import { apiClient, apiJson } from "@/lib/api";
+import { apiClient } from "@/lib/api";
 import { useAuthStore } from "@/lib/auth-store";
-import type { Assignment, AssignmentStatus, Paginated } from "@/lib/types";
-import { ASSIGNMENTS_PAGE_SIZE, totalPages } from "@/lib/pagination";
+import type { Assignment, AssignmentStatus } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import {
   ASSIGNMENTS_QUERY_KEY,
@@ -34,11 +34,9 @@ export default function AssignmentsPage() {
   });
 
   const meta = list.data?.meta;
-  console.log(meta);
 
   useEffect(() => {
     if (!meta?.hasNextPage) return;
-
     void queryClient.prefetchQuery(
       useAssignmentsQuery(userId, status, page + 1),
     );
@@ -48,9 +46,7 @@ export default function AssignmentsPage() {
     mutationFn: async (a: Assignment) => {
       const next: Assignment["status"] =
         a.status === "COMPLETED" ? "PENDING" : "COMPLETED";
-
       await apiClient.patch(`/assignment/${a.id}/status`, { status: next });
-
       return next;
     },
     onSuccess: () => {
@@ -64,8 +60,8 @@ export default function AssignmentsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Задания</h1>
-          <p className="text-slate-600">Фильтруйте и отмечайте выполнение</p>
+          <h1 className="xmb-title">Задания</h1>
+          <p className="xmb-subtitle">Фильтруйте и отмечайте выполнение</p>
         </div>
         <Link href="/assignments/new">
           <Button type="button">Добавить</Button>
@@ -81,10 +77,10 @@ export default function AssignmentsPage() {
               setPage(1);
               setStatus(s.value);
             }}
-            className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${status === s.value
-                ? "bg-sky-600 text-white"
-                : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
-              }`}
+            className={cn(
+              "xmb-chip",
+              status === s.value && "xmb-chip-active",
+            )}
           >
             {s.label}
           </button>
@@ -92,43 +88,45 @@ export default function AssignmentsPage() {
       </div>
 
       {list.isError && (
-        <p className="text-sm text-red-600">Ошибка загрузки списка</p>
+        <p className="text-sm text-[var(--danger)]">Ошибка загрузки списка</p>
       )}
 
       <div className="grid gap-3">
         {list.isLoading &&
           Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i} className="h-24 animate-pulse bg-slate-50" />
+            <Card key={i} className="h-24 animate-pulse bg-[var(--info-bg)]" />
           ))}
         {list.data?.data.map((a) => (
-          <Card key={a.id} className="border-slate-100">
+          <Card key={a.id} className="p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <Link
                   href={`/assignments/${a.id}`}
-                  className="text-lg font-medium text-sky-900 hover:underline"
+                  className="text-lg font-medium text-[var(--foreground)] hover:opacity-70"
                 >
                   {a.title}
                 </Link>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-[var(--foreground-muted)]">
                   {a.subject?.name ?? "Направление"} ·{" "}
                   {formatDue(a.dueDay)} · {priorityRu(a.priority)}
                   {a.group?.name ? ` · ${a.group.name}` : ""}
                 </p>
                 {a.description && (
-                  <p className="mt-1 line-clamp-2 text-sm text-slate-600">
+                  <p className="mt-1 line-clamp-2 text-sm text-[var(--foreground-muted)]">
                     {a.description}
                   </p>
                 )}
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <span
-                  className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${a.status === "COMPLETED"
-                      ? "bg-emerald-100 text-emerald-800"
+                  className={cn(
+                    "xmb-badge",
+                    a.status === "COMPLETED"
+                      ? "xmb-badge-success"
                       : a.status === "OVERDUE"
-                        ? "bg-amber-100 text-amber-900"
-                        : "bg-slate-100 text-slate-700"
-                    }`}
+                        ? "xmb-badge-warning"
+                        : "xmb-badge-default",
+                  )}
                 >
                   {statusRu(a.status)}
                 </span>
@@ -159,10 +157,10 @@ export default function AssignmentsPage() {
           >
             Назад
           </Button>
-          <span className="text-sm tabular-nums text-slate-600">
+          <span className="text-sm tabular-nums text-[var(--foreground-muted)]">
             Стр. {meta.page} из {meta.lastPage}
-            <span className="text-slate-400"> · </span>
-            <span className="text-slate-500">всего {meta.total}</span>
+            <span className="text-[var(--foreground-faint)]"> · </span>
+            <span>всего {meta.total}</span>
           </span>
           <Button
             type="button"

@@ -8,6 +8,8 @@ import { establishSession } from "@/lib/session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { InlineLinkButton } from "@/components/ui/inline-link-button";
+import { AuthLayout } from "@/components/auth-layout";
 
 function RegisterForm() {
   const router = useRouter();
@@ -49,27 +51,24 @@ function RegisterForm() {
   }
 
   return (
-    <Card className="w-full max-w-md border-sky-100/80">
-      <h1 className="text-xl font-semibold text-slate-900">Регистрация</h1>
-      <p className="mt-1 text-sm text-slate-500">
+    <Card>
+      <h1 className="xmb-section-title">Регистрация</h1>
+      <p className="mt-1 text-sm text-[var(--foreground-muted)]">
         Уже есть аккаунт?{" "}
-        <Link
+        <InlineLinkButton
           href={inviteToken ? `/login?invite=${encodeURIComponent(inviteToken)}` : "/login"}
-          className="font-medium text-sky-700 hover:underline"
         >
           Войти
-        </Link>
+        </InlineLinkButton>
       </p>
       {inviteToken && (
-        <p className="mt-3 rounded-lg bg-sky-50 px-3 py-2 text-sm text-sky-900">
+        <p className="xmb-alert xmb-alert-info mt-3">
           После регистрации вы присоединитесь к группе по приглашению.
         </p>
       )}
       <form onSubmit={(e) => void onSubmit(e)} className="mt-6 space-y-4">
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">
-            Имя
-          </label>
+          <label className="xmb-label">Имя</label>
           <Input
             required
             minLength={2}
@@ -80,9 +79,7 @@ function RegisterForm() {
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">
-            Email
-          </label>
+          <label className="xmb-label">Email</label>
           <Input
             type="email"
             required
@@ -92,9 +89,7 @@ function RegisterForm() {
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">
-            Пароль (от 8 символов)
-          </label>
+          <label className="xmb-label">Пароль (от 8 символов)</label>
           <Input
             type="password"
             required
@@ -105,7 +100,7 @@ function RegisterForm() {
           />
         </div>
         {error && (
-          <p className="text-sm text-red-600" role="alert">
+          <p className="text-sm text-[var(--danger)]" role="alert">
             {error}
           </p>
         )}
@@ -119,10 +114,10 @@ function RegisterForm() {
 
 export default function RegisterPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--background)] px-4">
-      <Suspense fallback={<div className="text-slate-500">Загрузка…</div>}>
+    <AuthLayout>
+      <Suspense fallback={<div className="text-[var(--foreground-muted)]">Загрузка…</div>}>
         <RegisterForm />
       </Suspense>
-    </div>
+    </AuthLayout>
   );
 }
