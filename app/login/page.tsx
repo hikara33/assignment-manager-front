@@ -67,8 +67,9 @@ function LoginForm() {
 
   return (
     <Card>
-      <h1 className="xmb-section-title">Вход</h1>
-      <p className="mt-1 text-sm text-[var(--foreground-muted)]">
+      <p className="xmb-section-eyebrow">Шаг 01</p>
+      <h1 className="xmb-section-title mt-1">Вход в систему</h1>
+      <p className="mt-2 text-sm text-[var(--foreground-muted)]">
         Нет аккаунта?{" "}
         <InlineLinkButton
           href={

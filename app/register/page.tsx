@@ -52,8 +52,9 @@ function RegisterForm() {
 
   return (
     <Card>
-      <h1 className="xmb-section-title">Регистрация</h1>
-      <p className="mt-1 text-sm text-[var(--foreground-muted)]">
+      <p className="xmb-section-eyebrow">Шаг 01</p>
+      <h1 className="xmb-section-title mt-1">Новый профиль</h1>
+      <p className="mt-2 text-sm text-[var(--foreground-muted)]">
         Уже есть аккаунт?{" "}
         <InlineLinkButton
           href={inviteToken ? `/login?invite=${encodeURIComponent(inviteToken)}` : "/login"}

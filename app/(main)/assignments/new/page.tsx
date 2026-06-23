@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { BackButton } from "@/components/ui/back-button";
-import { ASSIGNMENTS_QUERY_KEY } from "@/lib/queries/assignments";
+import { invalidateDashboard } from "@/lib/queries/dashboard";
 
 function useMyGroups() {
   return useQuery({
@@ -68,9 +68,7 @@ export default function NewAssignmentPage() {
       });
     },
     onSuccess: (a) => {
-      void qc.invalidateQueries({ queryKey: [ASSIGNMENTS_QUERY_KEY] });
-      void qc.invalidateQueries({ queryKey: ["dashboard"] });
-      void qc.invalidateQueries({ queryKey: ["prioritized"] });
+      invalidateDashboard(qc);
       router.push(`/assignments/${a.id}`);
     },
     onError: (err) => {
@@ -79,10 +77,16 @@ export default function NewAssignmentPage() {
   });
 
   return (
-    <div className="mx-auto max-w-xl space-y-6">
+    <div className="mx-auto max-w-xl space-y-8">
       <div>
         <BackButton href="/assignments">К списку</BackButton>
-        <h1 className="xmb-title mt-4">Новое задание</h1>
+        <header className="xmb-page-header mt-4">
+          <span className="xmb-page-eyebrow">Новый объект</span>
+          <h1 className="xmb-page-title mt-2">Новое задание</h1>
+          <p className="xmb-page-tagline">
+            Заполните карточку — задание появится в ленте и на дашборде.
+          </p>
+        </header>
       </div>
 
       <Card>

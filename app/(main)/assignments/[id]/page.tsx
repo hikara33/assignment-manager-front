@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { BackButton } from "@/components/ui/back-button";
+import { invalidateDashboard } from "@/lib/queries/dashboard";
 
 function dueToLocal(iso: string) {
   const d = new Date(iso);
@@ -90,8 +91,16 @@ function AssignmentEditor({
   const a = assignment;
 
   return (
-    <div className="mx-auto max-w-xl space-y-6">
+    <div className="mx-auto max-w-xl space-y-8">
       <BackButton href="/assignments">К списку</BackButton>
+
+      <header className="xmb-page-header">
+        <span className="xmb-page-eyebrow">Задание</span>
+        <h1 className="xmb-page-title mt-2">{a.title}</h1>
+        <p className="xmb-page-tagline">
+          Редактируйте параметры, меняйте статус или удалите карточку целиком.
+        </p>
+      </header>
 
       <div className="flex flex-wrap gap-2">
         <Button
@@ -117,7 +126,8 @@ function AssignmentEditor({
       </div>
 
       <Card>
-        <h1 className="xmb-section-title">Редактирование</h1>
+        <p className="xmb-section-eyebrow">Карточка</p>
+        <h2 className="xmb-section-title mt-1">Редактирование</h2>
         <form
           className="mt-4 space-y-4"
           onSubmit={(e) => {

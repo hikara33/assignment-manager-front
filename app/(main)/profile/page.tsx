@@ -38,8 +38,14 @@ export default function ProfilePage() {
   const u = live.data;
 
   return (
-    <div className="mx-auto max-w-lg space-y-6">
-      <h1 className="xmb-title">Профиль</h1>
+    <div className="mx-auto max-w-lg space-y-8">
+      <header className="xmb-page-header">
+        <span className="xmb-page-eyebrow">04 · Профиль</span>
+        <h1 className="xmb-page-title mt-2">{u?.name ?? "Профиль"}</h1>
+        <p className="xmb-page-tagline">
+          Учётные данные, роль и переключатель синхронизации с API.
+        </p>
+      </header>
 
       <Card>
         {u ? (

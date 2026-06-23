@@ -88,17 +88,19 @@ function AdminContent() {
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="xmb-title">Администрирование</h1>
-        <p className="xmb-subtitle">
-          Пользователи и направления.
-        </p>
-        <BackButton href="/dashboard" className="mt-3">
-          Обзор
-        </BackButton>
+        <BackButton href="/dashboard">Обзор</BackButton>
+        <header className="xmb-page-header mt-4">
+          <span className="xmb-page-eyebrow">05 · Системное</span>
+          <h1 className="xmb-page-title mt-2">Администрирование</h1>
+          <p className="xmb-page-tagline">
+            Пользователи системы и доступные направления.
+          </p>
+        </header>
       </div>
 
       <Card>
-        <h2 className="xmb-section-title">Пользователи</h2>
+        <p className="xmb-section-eyebrow">Список</p>
+        <h2 className="xmb-section-title mt-1">Пользователи</h2>
         {users.isError && (
           <p className="mt-2 text-sm text-[var(--danger)]">
             {users.error instanceof ApiError
@@ -129,7 +131,8 @@ function AdminContent() {
       </Card>
 
       <Card>
-        <h2 className="xmb-section-title">Направления</h2>
+        <p className="xmb-section-eyebrow">Каталог</p>
+        <h2 className="xmb-section-title mt-1">Направления</h2>
         <form
           className="mt-4 grid gap-3 sm:grid-cols-2"
           onSubmit={(e) => {

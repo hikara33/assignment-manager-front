@@ -9,10 +9,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import {
-  ASSIGNMENTS_QUERY_KEY,
-  useAssignmentsQuery,
-} from "@/lib/queries/assignments";
+import { useAssignmentsQuery } from "@/lib/queries/assignments";
+import { invalidateDashboard } from "@/lib/queries/dashboard";
 
 const statuses: { value: AssignmentStatus | ""; label: string }[] = [
   { value: "", label: "Все" },
@@ -50,25 +48,27 @@ export default function AssignmentsPage() {
       return next;
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: [ASSIGNMENTS_QUERY_KEY] });
-      void queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-      void queryClient.invalidateQueries({ queryKey: ["prioritized"] });
+      invalidateDashboard(queryClient);
     },
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="xmb-title">Задания</h1>
-          <p className="xmb-subtitle">Фильтруйте и отмечайте выполнение</p>
-        </div>
+    <div className="space-y-8">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+        <header className="xmb-page-header">
+          <span className="xmb-page-eyebrow">02 · Каталог</span>
+          <h1 className="xmb-page-title mt-2">Задания</h1>
+          <p className="xmb-page-tagline">
+            Фильтруйте по статусу, открывайте карточку и отмечайте выполнение.
+          </p>
+        </header>
         <Link href="/assignments/new">
           <Button type="button">Добавить</Button>
         </Link>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="xmb-section-eyebrow mr-1">Фильтр</span>
         {statuses.map((s) => (
           <button
             key={s.value || "all"}

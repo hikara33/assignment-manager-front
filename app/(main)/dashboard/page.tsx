@@ -18,6 +18,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useMemo, useState } from "react";
+import { invalidateDashboard } from "@/lib/queries/dashboard";
 
 export default function DashboardPage() {
   const queryClient = useQueryClient();
@@ -91,11 +92,7 @@ export default function DashboardPage() {
       }),
     onSuccess: () => {
       setRescheduleError(null);
-      void queryClient.invalidateQueries({ queryKey: ["reschedule"] });
-      void queryClient.invalidateQueries({ queryKey: ["prioritized"] });
-      void queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-      void queryClient.invalidateQueries({ queryKey: ["assignments"] });
-      void queryClient.invalidateQueries({ queryKey: ["assignments", "lookup"] });
+      invalidateDashboard(queryClient);
     },
     onError: (err) => {
       setRescheduleError(rescheduleErrorMessage(err));
@@ -103,12 +100,15 @@ export default function DashboardPage() {
   });
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="xmb-title">Обзор</h1>
-          <p className="xmb-subtitle">Задания и подсказки</p>
-        </div>
+    <div className="space-y-10">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+        <header className="xmb-page-header">
+          <span className="xmb-page-eyebrow">01 · Сводка дня</span>
+          <h1 className="xmb-page-title mt-2">Обзор</h1>
+          <p className="xmb-page-tagline">
+            Задания, конфликты и подсказки по переносу — всё на одном экране.
+          </p>
+        </header>
         <div className="flex gap-2">
           <Link href="/assignments/new">
             <Button type="button">Новое задание</Button>
@@ -120,17 +120,21 @@ export default function DashboardPage() {
         <p className="text-sm text-[var(--danger)]">Не удалось загрузить статистику</p>
       )}
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        <StatCard label="Всего" value={s?.total} loading={stats.isLoading} />
-        <StatCard label="В работе" value={s?.pending} loading={stats.isLoading} accent />
-        <StatCard label="Выполнено" value={s?.completed} loading={stats.isLoading} />
-        <StatCard label="Просрочено" value={s?.overdue} loading={stats.isLoading} warn />
-        <StatCard label="Срочные" value={s?.urgent} loading={stats.isLoading} danger />
-      </div>
+      <section>
+        <p className="xmb-section-eyebrow">Метрики</p>
+        <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <StatCard label="Всего" value={s?.total} loading={stats.isLoading} />
+          <StatCard label="В работе" value={s?.pending} loading={stats.isLoading} accent />
+          <StatCard label="Выполнено" value={s?.completed} loading={stats.isLoading} />
+          <StatCard label="Просрочено" value={s?.overdue} loading={stats.isLoading} warn />
+          <StatCard label="Срочные" value={s?.urgent} loading={stats.isLoading} danger />
+        </div>
+      </section>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
-          <h2 className="xmb-section-title">Приоритетные задания</h2>
+          <p className="xmb-section-eyebrow">Лента</p>
+          <h2 className="xmb-section-title mt-1">Приоритетные задания</h2>
           <p className="mt-1 text-xs text-[var(--foreground-muted)]">
             Красным — самые срочные, жёлтым — просроченные.
           </p>
@@ -163,8 +167,11 @@ export default function DashboardPage() {
         </Card>
 
         <Card>
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="xmb-section-title">Конфликты дедлайнов</h2>
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <p className="xmb-section-eyebrow">Сигналы</p>
+              <h2 className="xmb-section-title mt-1">Конфликты дедлайнов</h2>
+            </div>
             {!conflicts.isLoading && conflicts.data?.length ? (
               <span className="xmb-badge xmb-badge-danger">{conflicts.data.length}</span>
             ) : null}
@@ -215,7 +222,8 @@ export default function DashboardPage() {
       </div>
 
       <Card>
-        <h2 className="xmb-section-title">Рекомендации по переносу</h2>
+        <p className="xmb-section-eyebrow">Подсказки</p>
+        <h2 className="xmb-section-title mt-1">Рекомендации по переносу</h2>
         <p className="mt-2 border-l-2 border-[var(--border-strong)] pl-3 text-xs leading-relaxed text-[var(--foreground-muted)]">
           Подсказки, как сдвинуть сроки, если дедлайны пересекаются или день
           перегружен. Личные задания можно перенести сразу по кнопке; для заданий

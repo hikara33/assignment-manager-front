@@ -8,23 +8,24 @@ export function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-12">
       <XmbBackground />
-      <div className="relative z-10 mb-8 text-center">
-        <p className="text-[0.65rem] font-medium uppercase tracking-[0.35em] text-[var(--foreground-faint)]">
-          Welcome to
+
+      <div className="relative z-10 mb-10 text-center">
+        <span className="xmb-boot-eyebrow">Welcome to</span>
+        <h1 className="xmb-boot-brand mt-3">{APP_NAME}</h1>
+        <p className="mt-3 text-sm text-[var(--foreground-muted)]">
+          {APP_TAGLINE}
         </p>
-        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[var(--foreground)]">
-          {APP_NAME}
-        </h1>
-        <p className="mt-1 text-sm text-[var(--foreground-muted)]">{APP_TAGLINE}</p>
       </div>
+
       <div className="relative z-10 w-full max-w-md">{children}</div>
+
       <footer className="relative z-10 mt-10">
         <div className="xmb-hints">
-          <span>
-            <kbd>Tab</kbd> поля
+          <span className="xmb-hint-btn xmb-hint-cross">
+            <kbd>Enter</kbd> Подтвердить
           </span>
-          <span>
-            <kbd>Enter</kbd> подтвердить
+          <span className="xmb-hint-btn xmb-hint-square">
+            <kbd>Tab</kbd> Поля
           </span>
         </div>
       </footer>

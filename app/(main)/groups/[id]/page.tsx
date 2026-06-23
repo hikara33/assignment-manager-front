@@ -112,24 +112,28 @@ export default function GroupDetailPage() {
   });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div>
         <BackButton href="/groups">Все команды</BackButton>
-        <h1 className="xmb-title mt-4">{groupName}</h1>
-        <p className="font-mono text-xs text-[var(--foreground-faint)]">{id}</p>
-        {myRole && (
-          <p className="mt-1 text-sm text-[var(--foreground-muted)]">
-            Ваша роль:{" "}
-            <strong className="text-[var(--foreground)]">
-              {myRole === "OWNER" ? "Владелец" : "Участник"}
-            </strong>
-          </p>
-        )}
+        <header className="xmb-page-header mt-4">
+          <span className="xmb-page-eyebrow">Команда</span>
+          <h1 className="xmb-page-title mt-2">{groupName}</h1>
+          <p className="mt-2 font-mono text-xs text-[var(--foreground-faint)]">{id}</p>
+          {myRole && (
+            <p className="mt-1 text-sm text-[var(--foreground-muted)]">
+              Ваша роль:{" "}
+              <strong className="text-[var(--foreground)]">
+                {myRole === "OWNER" ? "Владелец" : "Участник"}
+              </strong>
+            </p>
+          )}
+        </header>
       </div>
 
       {myRole === "OWNER" && (
         <Card>
-          <h2 className="xmb-section-title">Пригласить по email</h2>
+          <p className="xmb-section-eyebrow">Приглашение</p>
+          <h2 className="xmb-section-title mt-1">Пригласить по email</h2>
           <p className="text-sm text-[var(--foreground-muted)]">
             На почту уйдёт ссылка; для приёма нужен тот же email в аккаунте.
           </p>
@@ -163,7 +167,8 @@ export default function GroupDetailPage() {
       )}
 
       <Card>
-        <h2 className="xmb-section-title">Задачи команды</h2>
+        <p className="xmb-section-eyebrow">Лента</p>
+        <h2 className="xmb-section-title mt-1">Задачи команды</h2>
 
         {groupAssignments.isLoading && (
           <p className="text-[var(--foreground-muted)]">Загрузка…</p>
@@ -201,7 +206,8 @@ export default function GroupDetailPage() {
       </Card>
 
       <Card>
-        <h2 className="xmb-section-title">Участники</h2>
+        <p className="xmb-section-eyebrow">Состав</p>
+        <h2 className="xmb-section-title mt-1">Участники</h2>
         {members.isLoading && (
           <p className="text-[var(--foreground-muted)]">Загрузка…</p>
         )}

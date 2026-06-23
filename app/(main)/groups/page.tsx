@@ -42,17 +42,19 @@ export default function GroupsPage() {
   });
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="xmb-title">Команды</h1>
-        <p className="xmb-subtitle">
+    <div className="space-y-10">
+      <header className="xmb-page-header">
+        <span className="xmb-page-eyebrow">03 · Сообщество</span>
+        <h1 className="xmb-page-title mt-2">Команды</h1>
+        <p className="xmb-page-tagline">
           Участники и приглашения. Список ниже собран из ваших заданий с
-          привязкой к командам
+          привязкой к командам.
         </p>
-      </div>
+      </header>
 
       <Card>
-        <h2 className="xmb-section-title">Создать команду</h2>
+        <p className="xmb-section-eyebrow">Создание</p>
+        <h2 className="xmb-section-title mt-1">Новая команда</h2>
         <form
           className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end"
           onSubmit={(e) => {
@@ -90,7 +92,10 @@ export default function GroupsPage() {
       </Card>
 
       <div className="space-y-3">
-        <h2 className="xmb-section-title">Мои команды</h2>
+        <div>
+          <p className="xmb-section-eyebrow">Список</p>
+          <h2 className="xmb-section-title mt-1">Мои команды</h2>
+        </div>
         {groups.isLoading && (
           <p className="text-[var(--foreground-muted)]">Загрузка…</p>
         )}

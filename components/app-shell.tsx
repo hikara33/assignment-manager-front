@@ -107,7 +107,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <XmbBackground />
 
       <div className="relative z-10 flex min-h-screen flex-col">
-        {/* Status bar */}
         <header className="flex items-center justify-between px-6 pt-5 pb-2">
           <div className="flex items-center gap-3">
             <div
@@ -140,42 +139,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        {/* XMB horizontal nav */}
-        <nav className="px-6 pt-4 pb-2" aria-label="Основная навигация">
-          <ul className="flex items-end gap-6 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <nav className="px-6 pt-6 pb-2" aria-label="Основная навигация">
+          <ul className="flex items-end gap-7 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {allNav.map((item) => {
               const active = item.match
                 ? item.match(pathname)
                 : pathname === item.href;
               return (
-                <li key={item.href} className="shrink-0">
+                <li key={item.href} className="shrink-0 pb-3">
                   <Link
                     href={item.href}
-                    className={cn(
-                      "group flex flex-col items-center gap-1.5 transition-all duration-300",
-                      active ? "scale-110" : "opacity-50 hover:opacity-75",
-                    )}
+                    data-active={active}
+                    className={cn("xmb-nav-item", "group")}
                   >
-                    <span
-                      className={cn(
-                        "transition-colors duration-300",
-                        active
-                          ? "text-[var(--nav-active)]"
-                          : "text-[var(--nav-inactive)]",
-                      )}
-                    >
-                      {item.icon(active)}
-                    </span>
-                    <span
-                      className={cn(
-                        "text-[0.6875rem] font-medium tracking-wide transition-all duration-300",
-                        active
-                          ? "text-[var(--foreground)]"
-                          : "text-[var(--foreground-faint)]",
-                      )}
-                    >
-                      {item.label}
-                    </span>
+                    <span className="xmb-nav-icon">{item.icon(active)}</span>
+                    <span className="xmb-nav-label">{item.label}</span>
                   </Link>
                 </li>
               );
@@ -183,20 +161,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </ul>
         </nav>
 
-        {/* Content panel */}
         <main className="flex-1 px-6 py-4">
           <div className="mx-auto max-w-5xl rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--card-tone)]/60 p-6 shadow-[var(--shadow-panel)] backdrop-blur-md md:p-8">
             {children}
           </div>
         </main>
 
-        {/* Footer hints */}
         <footer className="px-6 py-4">
           <div className="xmb-hints">
-            <span>вверх / вниз — пункты</span>
-            <span>влево / вправо — категории</span>
-            <span>
-              <kbd>Enter</kbd> открыть
+            <span className="xmb-hint-btn xmb-hint-cross">
+              <kbd>Enter</kbd> Открыть
+            </span>
+            <span className="xmb-hint-btn xmb-hint-circle">
+              <kbd>Esc</kbd> Назад
+            </span>
+            <span className="xmb-hint-btn xmb-hint-square">
+              <kbd>↑↓</kbd> Пункты
+            </span>
+            <span className="xmb-hint-btn xmb-hint-triangle">
+              <kbd>←→</kbd> Категории
             </span>
           </div>
         </footer>
