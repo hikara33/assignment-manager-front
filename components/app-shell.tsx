@@ -61,10 +61,10 @@ function Clock() {
     return () => clearInterval(id);
   }, []);
 
-  if (!now) return <span className="text-xs text-[var(--foreground-faint)]">--:--</span>;
+  if (!now) return <span className="hidden text-xs text-[var(--foreground-faint)] sm:inline">--:--</span>;
 
   return (
-    <time className="text-xs tabular-nums text-[var(--foreground-muted)]">
+    <time className="hidden text-xs tabular-nums text-[var(--foreground-muted)] sm:inline">
       {now.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit" })}{" "}
       {now.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })}
     </time>
@@ -107,27 +107,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <XmbBackground />
 
       <div className="relative z-10 flex min-h-screen flex-col">
-        <header className="flex items-center justify-between px-6 pt-5 pb-2">
-          <div className="flex items-center gap-3">
+        <header className="flex items-center justify-between gap-3 px-4 pt-4 pb-2 sm:px-6 sm:pt-5">
+          <div className="flex min-w-0 items-center gap-3">
             <div
-              className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent)] text-sm font-semibold text-white shadow-[var(--shadow-soft)]"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--accent)] text-sm font-semibold text-white shadow-[var(--shadow-soft)]"
               title={user?.name}
             >
               {initial}
             </div>
-            <div>
+            <div className="min-w-0">
               <Link
                 href="/dashboard"
-                className="text-sm font-semibold tracking-tight text-[var(--foreground)] hover:opacity-80"
+                className="block truncate text-sm font-semibold tracking-tight text-[var(--foreground)] hover:opacity-80"
               >
                 {APP_NAME}
               </Link>
               {user && (
-                <p className="text-[0.65rem] text-[var(--foreground-faint)]">{user.name}</p>
+                <p className="truncate text-[0.65rem] text-[var(--foreground-faint)]">{user.name}</p>
               )}
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-4">
             <Clock />
             <button
               type="button"
@@ -139,8 +139,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <nav className="px-6 pt-6 pb-2" aria-label="Основная навигация">
-          <ul className="flex items-end gap-7 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <nav className="px-4 pt-4 pb-2 sm:px-6 sm:pt-6" aria-label="Основная навигация">
+          <ul className="-mx-4 flex items-end gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:gap-7 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {allNav.map((item) => {
               const active = item.match
                 ? item.match(pathname)
@@ -161,14 +161,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </ul>
         </nav>
 
-        <main className="flex-1 px-6 py-4">
-          <div className="mx-auto max-w-5xl rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--card-tone)]/60 p-6 shadow-[var(--shadow-panel)] backdrop-blur-md md:p-8">
+        <main className="flex-1 px-3 py-3 sm:px-6 sm:py-4">
+          <div className="mx-auto max-w-5xl rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--card-tone)]/60 p-4 shadow-[var(--shadow-panel)] backdrop-blur-md sm:rounded-[var(--radius-xl)] sm:p-6 md:p-8">
             {children}
           </div>
         </main>
 
-        <footer className="px-6 py-4">
-          <div className="xmb-hints">
+        <footer className="px-4 py-4 sm:px-6">
+          <div className="xmb-hints hidden sm:flex">
             <span className="xmb-hint-btn xmb-hint-cross">
               <kbd>Enter</kbd> Открыть
             </span>

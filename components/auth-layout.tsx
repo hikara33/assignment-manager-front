@@ -64,8 +64,11 @@ export function AuthLayout({ children }: { children: ReactNode }) {
         </p>
       </div>
 
-      <div className="relative z-10 flex flex-1 items-start justify-end gap-95 pt-2">
-        <aside className="xmb-xmb-list hidden md:flex" aria-hidden="true">
+      <div className="relative z-10 flex flex-1 flex-col items-stretch justify-end gap-8 pt-2 md:flex-row md:items-start md:justify-end md:gap-16 lg:gap-24">
+        <aside
+          className="xmb-xmb-list hidden md:flex md:flex-1 md:max-w-md"
+          aria-hidden="true"
+        >
           {previewItems.map((item) => {
             const isCenter = item.depth === "center";
             return (
@@ -85,11 +88,11 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           })}
         </aside>
 
-        <div className="w-full max-w-md">{children}</div>
+        <div className="mx-auto w-full max-w-md md:mx-0">{children}</div>
       </div>
 
-      <footer className="relative z-10 mt-4 self-end">
-        <div className="xmb-hints">
+      <footer className="relative z-10 mt-6 md:mt-4 md:self-end">
+        <div className="xmb-hints hidden sm:flex">
           <span className="xmb-hint-btn xmb-hint-cross">
             <kbd>Enter</kbd> Подтвердить
           </span>
