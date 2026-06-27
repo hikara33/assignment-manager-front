@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Exo_2, JetBrains_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
@@ -19,6 +19,13 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: APP_NAME,
   description: APP_TAGLINE,
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#d8ddd6",
 };
 
 export default function RootLayout({
