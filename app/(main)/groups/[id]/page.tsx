@@ -117,8 +117,8 @@ export default function GroupDetailPage() {
         <BackButton href="/groups">Все команды</BackButton>
         <header className="xmb-page-header mt-4">
           <span className="xmb-page-eyebrow">Команда</span>
-          <h1 className="xmb-page-title mt-2">{groupName}</h1>
-          <p className="mt-2 font-mono text-xs text-[var(--foreground-faint)]">{id}</p>
+          <h1 className="xmb-page-title mt-2 break-words">{groupName}</h1>
+          <p className="mt-2 break-all font-mono text-xs text-[var(--foreground-faint)]">{id}</p>
           {myRole && (
             <p className="mt-1 text-sm text-[var(--foreground-muted)]">
               Ваша роль:{" "}
@@ -153,7 +153,11 @@ export default function GroupDetailPage() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <Button type="submit" disabled={invite.isPending}>
+            <Button
+              type="submit"
+              className="w-full sm:w-auto"
+              disabled={invite.isPending}
+            >
               Отправить
             </Button>
           </form>
@@ -220,9 +224,9 @@ export default function GroupDetailPage() {
               key={m.userId}
               className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"
             >
-              <div>
-                <p className="font-medium text-[var(--foreground)]">{m.user.name}</p>
-                <p className="text-sm text-[var(--foreground-muted)]">{m.user.email}</p>
+              <div className="min-w-0">
+                <p className="break-words font-medium text-[var(--foreground)]">{m.user.name}</p>
+                <p className="break-all text-sm text-[var(--foreground-muted)]">{m.user.email}</p>
                 <p className="text-xs text-[var(--foreground-faint)]">
                   {m.role === "OWNER" ? "Владелец" : "Участник"}
                 </p>
@@ -233,6 +237,7 @@ export default function GroupDetailPage() {
                     <Button
                       type="button"
                       variant="secondary"
+                      className="flex-1 sm:flex-none"
                       disabled={transfer.isPending}
                       onClick={() => {
                         if (
@@ -251,6 +256,7 @@ export default function GroupDetailPage() {
                     <Button
                       type="button"
                       variant="danger"
+                      className="flex-1 sm:flex-none"
                       disabled={kick.isPending}
                       onClick={() => {
                         if (confirm(`Удалить ${m.user.name} из группы?`)) {
@@ -268,10 +274,11 @@ export default function GroupDetailPage() {
         </ul>
       </Card>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <Button
           type="button"
           variant="secondary"
+          className="w-full sm:w-auto"
           onClick={() => {
             if (confirm("Выйти из команды?")) leave.mutate();
           }}
@@ -283,6 +290,7 @@ export default function GroupDetailPage() {
           <Button
             type="button"
             variant="danger"
+            className="w-full sm:w-auto"
             onClick={() => {
               if (
                 confirm(

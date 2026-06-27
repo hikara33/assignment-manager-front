@@ -110,8 +110,10 @@ export default function DashboardPage() {
           </p>
         </header>
         <div className="flex gap-2">
-          <Link href="/assignments/new">
-            <Button type="button">Новое задание</Button>
+          <Link href="/assignments/new" className="w-full sm:w-auto">
+            <Button type="button" className="w-full sm:w-auto">
+              Новое задание
+            </Button>
           </Link>
         </div>
       </div>
@@ -122,7 +124,7 @@ export default function DashboardPage() {
 
       <section>
         <p className="xmb-section-eyebrow">Метрики</p>
-        <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">
           <StatCard label="Всего" value={s?.total} loading={stats.isLoading} />
           <StatCard label="В работе" value={s?.pending} loading={stats.isLoading} accent />
           <StatCard label="Выполнено" value={s?.completed} loading={stats.isLoading} />
@@ -146,9 +148,11 @@ export default function DashboardPage() {
               const row = prioritizedTaskRowClasses(a, topPrioritizedScore);
               return (
                 <li key={a.id}>
-                  <Link href={`/assignments/${a.id}`} className={row.link}>
-                    <span className={cn("font-medium", row.title)}>{a.title}</span>
-                    <span className={cn("text-xs tabular-nums", row.due)}>
+                  <Link href={`/assignments/${a.id}`} className={cn(row.link, "gap-3")}>
+                    <span className={cn("min-w-0 flex-1 truncate font-medium", row.title)}>
+                      {a.title}
+                    </span>
+                    <span className={cn("shrink-0 text-xs tabular-nums", row.due)}>
                       {formatDue(a.dueDay)}
                     </span>
                   </Link>
@@ -159,8 +163,8 @@ export default function DashboardPage() {
               <li className="text-sm text-[var(--foreground-muted)]">Пока нет заданий</li>
             )}
           </ul>
-          <Link href="/assignments" className="mt-4 inline-block">
-            <Button type="button" variant="secondary">
+          <Link href="/assignments" className="mt-4 inline-block w-full sm:w-auto">
+            <Button type="button" variant="secondary" className="w-full sm:w-auto">
               Все задания
             </Button>
           </Link>
@@ -196,8 +200,8 @@ export default function DashboardPage() {
                     key={conflict.date}
                     className="rounded-[var(--radius-md)] border border-[rgba(192,57,43,0.2)] bg-[var(--danger-bg)] p-3"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="font-medium text-[var(--danger)]">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0 break-words font-medium text-[var(--danger)]">
                         {conflict.tasks.map((t) => t.title).join(", ")}
                       </div>
                     </div>
@@ -261,7 +265,7 @@ export default function DashboardPage() {
                     className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--info-bg)] p-3"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="font-medium text-[var(--foreground)]">
+                      <div className="min-w-0 break-words font-medium text-[var(--foreground)]">
                         {item.taskTitle}
                       </div>
                       <div className="flex flex-wrap items-center gap-1.5">

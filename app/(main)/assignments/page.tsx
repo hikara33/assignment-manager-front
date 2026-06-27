@@ -62,8 +62,10 @@ export default function AssignmentsPage() {
             Фильтруйте по статусу, открывайте карточку и отмечайте выполнение.
           </p>
         </header>
-        <Link href="/assignments/new">
-          <Button type="button">Добавить</Button>
+        <Link href="/assignments/new" className="w-full sm:w-auto">
+          <Button type="button" className="w-full sm:w-auto">
+            Добавить
+          </Button>
         </Link>
       </div>
 
@@ -97,12 +99,12 @@ export default function AssignmentsPage() {
             <Card key={i} className="h-24 animate-pulse bg-[var(--info-bg)]" />
           ))}
         {list.data?.data.map((a) => (
-          <Card key={a.id} className="p-4">
+          <Card key={a.id} className="p-4 sm:p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
+              <div className="min-w-0">
                 <Link
                   href={`/assignments/${a.id}`}
-                  className="text-lg font-medium text-[var(--foreground)] hover:opacity-70"
+                  className="block break-words text-lg font-medium text-[var(--foreground)] hover:opacity-70"
                 >
                   {a.title}
                 </Link>
@@ -117,7 +119,7 @@ export default function AssignmentsPage() {
                   </p>
                 )}
               </div>
-              <div className="flex shrink-0 items-center gap-2">
+              <div className="flex shrink-0 flex-wrap items-center gap-2 sm:flex-nowrap">
                 <span
                   className={cn(
                     "xmb-badge",
@@ -133,6 +135,7 @@ export default function AssignmentsPage() {
                 <Button
                   type="button"
                   variant={a.status === "COMPLETED" ? "secondary" : "primary"}
+                  className="flex-1 sm:flex-none"
                   disabled={
                     toggleDone.isPending &&
                     toggleDone.variables.id === a.id

@@ -72,7 +72,11 @@ export default function GroupsPage() {
               placeholder="Например, Проектная команда"
             />
           </div>
-          <Button type="submit" disabled={create.isPending}>
+          <Button
+            type="submit"
+            className="w-full sm:w-auto"
+            disabled={create.isPending}
+          >
             {create.isPending ? "Создание…" : "Создать"}
           </Button>
         </form>
@@ -108,19 +112,19 @@ export default function GroupsPage() {
           </Card>
         )}
         {groups.data?.map((g) => (
-          <Card key={g.id} className="p-4">
+          <Card key={g.id} className="p-4 sm:p-4">
             <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-              <div>
+              <div className="min-w-0">
                 <Link
                   href={`/groups/${g.id}`}
-                  className="text-lg font-medium text-[var(--foreground)] hover:opacity-70"
+                  className="block break-words text-lg font-medium text-[var(--foreground)] hover:opacity-70"
                 >
                   {g.name}
                 </Link>
-                <p className="font-mono text-xs text-[var(--foreground-faint)]">{g.id}</p>
+                <p className="break-all font-mono text-xs text-[var(--foreground-faint)]">{g.id}</p>
               </div>
-              <Link href={`/groups/${g.id}`}>
-                <Button type="button" variant="secondary">
+              <Link href={`/groups/${g.id}`} className="w-full sm:w-auto">
+                <Button type="button" variant="secondary" className="w-full sm:w-auto">
                   Подробнее
                 </Button>
               </Link>

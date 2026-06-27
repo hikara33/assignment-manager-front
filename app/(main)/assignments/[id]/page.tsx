@@ -91,21 +91,22 @@ function AssignmentEditor({
   const a = assignment;
 
   return (
-    <div className="mx-auto max-w-xl space-y-8">
+    <div className="mx-auto max-w-xl space-y-6 sm:space-y-8">
       <BackButton href="/assignments">К списку</BackButton>
 
       <header className="xmb-page-header">
         <span className="xmb-page-eyebrow">Задание</span>
-        <h1 className="xmb-page-title mt-2">{a.title}</h1>
+        <h1 className="xmb-page-title mt-2 break-words">{a.title}</h1>
         <p className="xmb-page-tagline">
           Редактируйте параметры, меняйте статус или удалите карточку целиком.
         </p>
       </header>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <Button
           type="button"
           variant="secondary"
+          className="w-full sm:w-auto"
           onClick={() =>
             setStatus.mutate(a.status === "COMPLETED" ? "PENDING" : "COMPLETED")
           }
@@ -116,6 +117,7 @@ function AssignmentEditor({
         <Button
           type="button"
           variant="danger"
+          className="w-full sm:w-auto"
           onClick={() => {
             if (confirm("Удалить задание?")) remove.mutate();
           }}
@@ -180,14 +182,18 @@ function AssignmentEditor({
               {saveErr}
             </p>
           )}
-          <Button type="submit" disabled={save.isPending || !dueIso}>
+          <Button
+            type="submit"
+            className="w-full sm:w-auto"
+            disabled={save.isPending || !dueIso}
+          >
             {save.isPending ? "Сохранение…" : "Сохранить"}
           </Button>
         </form>
       </Card>
 
       <Card className="bg-[var(--info-bg)]">
-        <p className="text-sm text-[var(--foreground-muted)]">
+        <p className="break-all text-sm text-[var(--foreground-muted)]">
           Направление: <strong className="text-[var(--foreground)]">{a.subjectId}</strong> (id; название в списке
           заданий)
         </p>

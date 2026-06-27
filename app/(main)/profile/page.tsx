@@ -38,7 +38,7 @@ export default function ProfilePage() {
   const u = live.data;
 
   return (
-    <div className="mx-auto max-w-lg space-y-8">
+    <div className="mx-auto max-w-lg space-y-6 sm:space-y-8">
       <header className="xmb-page-header">
         <span className="xmb-page-eyebrow">04 · Профиль</span>
         <h1 className="xmb-page-title mt-2">{u?.name ?? "Профиль"}</h1>
@@ -60,7 +60,7 @@ export default function ProfilePage() {
               <dt className="text-[0.6875rem] font-medium uppercase tracking-wider text-[var(--foreground-faint)]">
                 Email
               </dt>
-              <dd className="mt-0.5 font-medium text-[var(--foreground)]">{u.email}</dd>
+              <dd className="mt-0.5 break-all font-medium text-[var(--foreground)]">{u.email}</dd>
             </div>
             <div>
               <dt className="text-[0.6875rem] font-medium uppercase tracking-wider text-[var(--foreground-faint)]">
@@ -82,7 +82,12 @@ export default function ProfilePage() {
         ) : (
           <p className="text-[var(--foreground-muted)]">Нет данных</p>
         )}
-        <Button type="button" variant="secondary" className="mt-6" onClick={() => void refresh()}>
+        <Button
+          type="button"
+          variant="secondary"
+          className="mt-6 w-full sm:w-auto"
+          onClick={() => void refresh()}
+        >
           Обновить из API
         </Button>
         {msg && <p className="mt-3 text-sm text-[var(--success)]">{msg}</p>}

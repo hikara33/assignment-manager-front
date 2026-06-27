@@ -160,7 +160,11 @@ function AdminContent() {
           {subErr && (
             <p className="text-sm text-[var(--danger)] sm:col-span-2">{subErr}</p>
           )}
-          <Button type="submit" disabled={createSubject.isPending}>
+          <Button
+            type="submit"
+            className="w-full sm:w-auto"
+            disabled={createSubject.isPending}
+          >
             Добавить направление
           </Button>
         </form>
@@ -171,16 +175,17 @@ function AdminContent() {
               key={s.id}
               className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"
             >
-              <div>
-                <p className="font-medium text-[var(--foreground)]">{s.name}</p>
+              <div className="min-w-0">
+                <p className="break-words font-medium text-[var(--foreground)]">{s.name}</p>
                 {s.description && (
-                  <p className="text-sm text-[var(--foreground-muted)]">{s.description}</p>
+                  <p className="break-words text-sm text-[var(--foreground-muted)]">{s.description}</p>
                 )}
-                <p className="font-mono text-xs text-[var(--foreground-faint)]">{s.id}</p>
+                <p className="break-all font-mono text-xs text-[var(--foreground-faint)]">{s.id}</p>
               </div>
               <Button
                 type="button"
                 variant="danger"
+                className="w-full sm:w-auto"
                 disabled={deleteSubject.isPending}
                 onClick={() => {
                   if (confirm(`Удалить предмет «${s.name}»?`)) {

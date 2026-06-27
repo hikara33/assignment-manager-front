@@ -77,7 +77,7 @@ export default function NewAssignmentPage() {
   });
 
   return (
-    <div className="mx-auto max-w-xl space-y-8">
+    <div className="mx-auto max-w-xl space-y-6 sm:space-y-8">
       <div>
         <BackButton href="/assignments">К списку</BackButton>
         <header className="xmb-page-header mt-4">
@@ -169,12 +169,16 @@ export default function NewAssignmentPage() {
               {error}
             </p>
           )}
-          <div className="flex gap-2">
-            <Button type="submit" disabled={create.isPending || !dueIso}>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button
+              type="submit"
+              className="w-full sm:w-auto"
+              disabled={create.isPending || !dueIso}
+            >
               {create.isPending ? "Создание…" : "Создать"}
             </Button>
-            <Link href="/assignments">
-              <Button type="button" variant="secondary">
+            <Link href="/assignments" className="w-full sm:w-auto">
+              <Button type="button" variant="secondary" className="w-full sm:w-auto">
                 Отмена
               </Button>
             </Link>
